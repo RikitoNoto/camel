@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 /// command class is the interface communication class and application.
@@ -40,11 +41,14 @@ abstract class CommandFactory{
 }
 
 class MessageHeader{
-  MessageHeader(Uint8List data):
-      command = "",
-      bodySize = 0;
-  final String command;
-  final int bodySize;
+  MessageHeader(Uint8List data){
+    RegExpMatch? commandMatch = RegExp('^(.*?)\n', dotAll: true, multiLine: true).firstMatch(utf8.decode(data));
+    command = commandMatch?.group(1) ?? '';
+    bodySize = 0;
+  }
+
+  late final String command;
+  late final int bodySize;
 }
 
 class Message{

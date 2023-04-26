@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -15,6 +16,7 @@ void main() {
     CommandFactory.clearCommands();
   });
   commandFactoryTest();
+  messageHeaderTest();
 }
 
 class CommandStub implements Command{
@@ -71,8 +73,6 @@ bool isInCommandList(Command command, List<Command> commandList){
   return result;
 }
 
-/// check get default commands.
-///
 void commandFactoryTest(){
   group('register command', (){
     test('should be return null if command no register', () {
@@ -133,6 +133,25 @@ void commandFactoryTest(){
       expect(commandList.length, 2);
       expect(isInCommandList(commandStub1, commandList), isTrue);
       expect(isInCommandList(commandStub2, commandList), isTrue);
+    });
+  });
+}
+
+void messageHeaderTest(){
+  group('get commands', (){
+    test('should be construct header with no command from 0 byte data', () {
+      MessageHeader header = MessageHeader(Uint8List(0));
+      expect(header.command, "");
+    });
+
+    test('should be construct header of A command from A command data', () {
+      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n")));
+      expect(header.command, "A");
+    });
+
+    test('should be construct header of B command from BBBB command data', () {
+      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("BBBB\n")));
+      expect(header.command, "BBBB");
     });
   });
 }
