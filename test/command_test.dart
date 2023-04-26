@@ -11,6 +11,9 @@ import 'package:camel/command.dart';
 @GenerateMocks([Message])
 @GenerateMocks([MessageHeader])
 void main() {
+  setUp(() async{
+    CommandFactory.clearCommands();
+  });
   commandFactoryTest();
 }
 
@@ -57,6 +60,17 @@ MockMessage constructMessageMock({
   return mockMessage;
 }
 
+bool isInCommandList(Command command, List<Command> commandList){
+  bool result = false;
+  for(Command c in commandList){
+    if(command == c){
+      result = true;
+      break;
+    }
+  }
+  return result;
+}
+
 /// check get default commands.
 ///
 void commandFactoryTest(){
@@ -96,4 +110,30 @@ void commandFactoryTest(){
       expect(command, commandStubSecond);
     });
   });
+
+  group('get command list', (){
+    test('should be get empty list when register no command', () {
+      expect(CommandFactory.commandList.length, 0);
+    });
+
+    test('should be get one content list when register one command', () {
+      CommandStub commandStub = CommandStub(command: "A");
+      CommandFactory.registerCommand(commandStub);
+      expect(CommandFactory.commandList.length, 1);
+      expect(CommandFactory.commandList[0], commandStub);
+    });
+
+    test('should be get two content list when register two command', () {
+      CommandStub commandStub1 = CommandStub(command: "A");
+      CommandFactory.registerCommand(commandStub1);
+      CommandStub commandStub2 = CommandStub(command: "B");
+      CommandFactory.registerCommand(commandStub2);
+
+      List<Command> commandList = CommandFactory.commandList;
+      expect(commandList.length, 2);
+      expect(isInCommandList(commandStub1, commandList), isTrue);
+      expect(isInCommandList(commandStub2, commandList), isTrue);
+    });
+  });
 }
+

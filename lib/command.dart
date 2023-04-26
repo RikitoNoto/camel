@@ -16,6 +16,10 @@ abstract class Command{
 abstract class CommandFactory{
   static final Map<String, Command> _commands = {};
 
+  static List<Command> get commandList{
+    return _commands.values.toList();
+  }
+
   static Command? getCommand(Message receivedData){
     for(Command command in _commands.values){
       // if match the command, return that command.
@@ -28,6 +32,10 @@ abstract class CommandFactory{
 
   static void registerCommand(Command command){
     _commands[command.command] = command;
+  }
+
+  static void clearCommands(){
+    _commands.clear();
   }
 }
 
