@@ -154,5 +154,26 @@ void messageHeaderTest(){
       expect(header.command, "BBBB");
     });
   });
-}
 
+  group('get body size', (){
+    test('should be get 0 byte as body size from 0 byte data', () {
+      MessageHeader header = MessageHeader(Uint8List(0));
+      expect(header.bodySize, 0);
+    });
+
+    test('should be get 0 byte as body size from only command data', () {
+      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n")));
+      expect(header.bodySize, 0);
+    });
+
+    test('should be get 1 byte as body size', () {
+      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n1\n")));
+      expect(header.bodySize, 1);
+    });
+
+    test('should be get 255 byte as body size', () {
+      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n255\n")));
+      expect(header.bodySize, 255);
+    });
+  });
+}

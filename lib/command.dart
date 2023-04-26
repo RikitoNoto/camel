@@ -42,10 +42,15 @@ abstract class CommandFactory{
 
 class MessageHeader{
   MessageHeader(Uint8List data){
-    RegExpMatch? commandMatch = RegExp('^(.*?)\n', dotAll: true, multiLine: true).firstMatch(utf8.decode(data));
+    String remain = utf8.decode(data);
+    RegExpMatch? commandMatch = RegExp('^(.*?)$delimiter(.*)', dotAll: true, multiLine: true).firstMatch(remain);
     command = commandMatch?.group(1) ?? '';
-    bodySize = 0;
+    remain = commandMatch?.group(2) ?? '';
+    RegExpMatch? bodySizeMatch = RegExp('^(.*?)$delimiter(.*)', dotAll: true, multiLine: true).firstMatch(remain);
+    bodySize = int.parse(bodySizeMatch?.group(1) ?? '0');
   }
+
+  static const String delimiter = "\n";
 
   late final String command;
   late final int bodySize;
