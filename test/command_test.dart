@@ -17,6 +17,7 @@ void main() {
   });
   commandFactoryTest();
   messageHeaderTest();
+  messageTest();
 }
 
 class CommandStub implements Command{
@@ -71,6 +72,10 @@ bool isInCommandList(Command command, List<Command> commandList){
     }
   }
   return result;
+}
+
+Uint8List convertUint8data(String message){
+  return Uint8List.fromList(utf8.encode(message));
 }
 
 void commandFactoryTest(){
@@ -145,12 +150,12 @@ void messageHeaderTest(){
     });
 
     test('should be construct header of A command from A command data', () {
-      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n")));
+      MessageHeader header = MessageHeader(convertUint8data("A\n"));
       expect(header.command, "A");
     });
 
     test('should be construct header of B command from BBBB command data', () {
-      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("BBBB\n")));
+      MessageHeader header = MessageHeader(convertUint8data("BBBB\n"));
       expect(header.command, "BBBB");
     });
   });
@@ -162,18 +167,61 @@ void messageHeaderTest(){
     });
 
     test('should be get 0 byte as body size from only command data', () {
-      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n")));
+      MessageHeader header = MessageHeader(convertUint8data("A\n"));
       expect(header.bodySize, 0);
     });
 
     test('should be get 1 byte as body size', () {
-      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n1\n")));
+      MessageHeader header = MessageHeader(convertUint8data("A\n1\n"));
       expect(header.bodySize, 1);
     });
 
     test('should be get 255 byte as body size', () {
-      MessageHeader header = MessageHeader(Uint8List.fromList(utf8.encode("A\n255\n")));
+      MessageHeader header = MessageHeader(convertUint8data("A\n255\n"));
       expect(header.bodySize, 255);
+    });
+  });
+
+  group('get header size', (){
+    test('should be get header size 0 when empty header gave', () {
+      MessageHeader header = MessageHeader(convertUint8data(""));
+      expect(header.headerSize, 0);
+    });
+
+    test('should be get header size 1 when 1 size header gave', () {
+      MessageHeader header = MessageHeader(convertUint8data("A"));
+      expect(header.headerSize, 1);
+    });
+
+    test('should be get header size when exist body', () {
+      MessageHeader header = MessageHeader(convertUint8data("A\n10\nbodydata"));
+      expect(header.headerSize, 5);
+    });
+  });
+}
+
+void messageTest(){
+  group('get header', (){
+    test('should be get header command,bodySize,headerSize', () {
+      Message message = Message(convertUint8data("A\n10\nbodydata"));
+      expect(message.header.command, "A");
+      expect(message.header.headerSize, 5);
+      expect(message.header.bodySize, 10);
+    });
+
+    test('should be get 0 size body from empty data', () {
+      Message message = Message(convertUint8data(""));
+      expect(message.body.length, 0);
+    });
+
+    test('should be get 0 size body from empty body', () {
+      Message message = Message(convertUint8data("A\n10\n"));
+      expect(message.body.length, 0);
+    });
+
+    test('should be get 1 size body from exist body', () {
+      Message message = Message(convertUint8data("A\n10\na"));
+      expect(message.body.length, 1);
     });
   });
 }

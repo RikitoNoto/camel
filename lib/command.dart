@@ -48,19 +48,23 @@ class MessageHeader{
     remain = commandMatch?.group(2) ?? '';
     RegExpMatch? bodySizeMatch = RegExp('^(.*?)$delimiter(.*)', dotAll: true, multiLine: true).firstMatch(remain);
     bodySize = int.parse(bodySizeMatch?.group(1) ?? '0');
+    remain = bodySizeMatch?.group(2) ?? '';
+    headerSize = data.length - remain.length;
   }
 
   static const String delimiter = "\n";
 
   late final String command;
   late final int bodySize;
+  late final int headerSize;
 }
 
 class Message{
-  Message(Uint8List data):
-        header = MessageHeader(Uint8List(0)),
-        body = Uint8List(0);
+  Message(Uint8List data) {
+    header = MessageHeader(data);
+    body = Uint8List.fromList(data.sublist(header.headerSize));
+  }
 
-  final MessageHeader header;
-  final Uint8List body;
+  late final MessageHeader header;
+  late final Uint8List body;
 }
