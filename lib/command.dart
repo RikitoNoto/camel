@@ -41,22 +41,47 @@ abstract class CommandFactory{
 }
 
 class MessageHeader{
-  MessageHeader(Uint8List data){
-    String remain = utf8.decode(data);
-    RegExpMatch? commandMatch = RegExp('^(.*?)$delimiter(.*)', dotAll: true, multiLine: true).firstMatch(remain);
-    command = commandMatch?.group(1) ?? '';
-    remain = commandMatch?.group(2) ?? '';
-    RegExpMatch? bodySizeMatch = RegExp('^(.*?)$delimiter(.*)', dotAll: true, multiLine: true).firstMatch(remain);
-    bodySize = int.parse(bodySizeMatch?.group(1) ?? '0');
-    remain = bodySizeMatch?.group(2) ?? '';
-    headerSize = data.length - remain.length;
-  }
-
   static const String delimiter = "\n";
 
   late final String command;
   late final int bodySize;
   late final int headerSize;
+
+  MessageHeader(Uint8List data){
+
+    String? header = parseHeaderSize(utf8.decode(data));
+
+    if(header == null) return;
+
+    command = parseHeaderSection(header, "COMMAND") ?? "";
+    bodySize = int.parse(parseHeaderSection(header, "BODY_SIZE") ?? "0");
+  }
+
+  String? parseHeaderSection(String header, String section){
+    RegExpMatch? valueMatch = RegExp('^$section=(.*?)\$', dotAll: true, multiLine: true).firstMatch(header);
+    return valueMatch?.group(1);
+  }
+
+  String? parseHeaderSize(String src){
+    RegExpMatch? headerSizeMatch = RegExp('^([0-9]+)(?:$delimiter(.*))?', dotAll: true).firstMatch(src);
+    final String? headerSizeStr = headerSizeMatch?.group(1);
+
+    // check it was not match.
+    // check it is a number.
+    if((headerSizeStr == null)){
+      throw const MessageFormatException('Could not find body size.');
+    }
+    else{
+      headerSize = int.parse(headerSizeStr);
+    }
+
+    try{
+      return headerSizeMatch?.group(2)?.substring(0, headerSize);
+    }
+    on RangeError {
+      return headerSizeMatch?.group(2)?.substring(0);
+    }
+  }
 }
 
 class Message{
@@ -67,4 +92,12 @@ class Message{
 
   late final MessageHeader header;
   late final Uint8List body;
+}
+
+class MessageFormatException implements Exception{
+  const MessageFormatException(this.message);
+  final String message;
+
+  @override
+  String toString() => message;
 }
