@@ -224,6 +224,29 @@ void messageHeaderTest(){
         expect(header.bodySize, 1);
       });
     });
+
+
+    group('get raw data', (){
+      test('should be not get raw data if the header size is 0.', () {
+        MessageHeader header = MessageHeader(convertUint8data("0\n"));
+        expect(header.rawData, "");
+      });
+
+      test('should be not get raw data if the header size is 0 and exist header data.', () {
+        MessageHeader header = MessageHeader(convertUint8data("0\ndata"));
+        expect(header.rawData, "");
+      });
+
+      test('should be get raw data if exist header data.', () {
+        MessageHeader header = MessageHeader(convertUint8data("4\ndata"));
+        expect(header.rawData, "data");
+      });
+
+      test('should be get raw data in the middle if header size is less.', () {
+        MessageHeader header = MessageHeader(convertUint8data("3\ndata"));
+        expect(header.rawData, "dat");
+      });
+    });
   });
 }
 

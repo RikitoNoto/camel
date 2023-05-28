@@ -46,15 +46,23 @@ class MessageHeader{
   late final String command;
   late final int bodySize;
   late final int headerSize;
+  late final String rawData;
 
   MessageHeader(Uint8List data){
 
     String? header = parseHeaderSize(utf8.decode(data));
 
-    if(header == null) return;
+    if(header == null) {
+      rawData = "";
+      return;
+    }
+    else{
+      rawData = header;
+    }
 
     command = parseHeaderSection(header, "COMMAND") ?? "";
     bodySize = int.parse(parseHeaderSection(header, "BODY_SIZE") ?? "0");
+
   }
 
   String? parseHeaderSection(String header, String section){
