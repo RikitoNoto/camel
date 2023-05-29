@@ -49,7 +49,6 @@ class MessageHeader{
   late final String rawData;
 
   MessageHeader(Uint8List data){
-
     String? header = parseHeaderSize(utf8.decode(data));
 
     if(header == null) {
@@ -95,7 +94,9 @@ class MessageHeader{
 class Message{
   Message(Uint8List data) {
     header = MessageHeader(data);
-    body = Uint8List.fromList(data.sublist(header.headerSize));
+    // body start position is the header size + the header size char count + LF
+    int headerStartPosition = header.headerSize + header.headerSize.toString().length + 1;
+    body = Uint8List.fromList(data.sublist(headerStartPosition, headerStartPosition + header.bodySize));
   }
 
   late final MessageHeader header;

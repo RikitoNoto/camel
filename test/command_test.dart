@@ -78,6 +78,18 @@ Uint8List convertUint8data(String message){
   return Uint8List.fromList(utf8.encode(message));
 }
 
+void expectUint8List(Uint8List exp, Uint8List actual){
+  try{
+    expect(exp.length, actual.length);
+    for(int i=0; i<exp.length; i++){
+      expect(exp[i], actual[i]);
+    }
+  }
+  catch(e){
+    fail("two lists are difference.\n expect: $exp\n actual: $actual");
+  }
+}
+
 void commandFactoryTest(){
   group('register command', (){
     test('should be return null if command no register', () {
@@ -225,7 +237,6 @@ void messageHeaderTest(){
       });
     });
 
-
     group('get raw data', (){
       test('should be not get raw data if the header size is 0.', () {
         MessageHeader header = MessageHeader(convertUint8data("0\n"));
@@ -247,31 +258,39 @@ void messageHeaderTest(){
         expect(header.rawData, "dat");
       });
     });
+
+    group('get header some pattern', (){
+      test('should be get variable data.', () {
+        MessageHeader header = MessageHeader(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
+        expect(header.headerSize, 33);
+        expect(header.rawData, "COMMAND=someCommand\nBODY_SIZE=10\n");
+        expect(header.bodySize, 10);
+        expect(header.command, "someCommand");
+      });
+    });
   });
 }
 
 void messageTest(){
-  group('get header', (){
-    // test('should be get header command,bodySize,headerSize', () {
-    //   Message message = Message(convertUint8data("A\n10\nbodydata"));
-    //   expect(message.header.command, "A");
-    //   expect(message.header.headerSize, 5);
-    //   expect(message.header.bodySize, 10);
-    // });
-    //
-    // test('should be get 0 size body from empty data', () {
-    //   Message message = Message(convertUint8data(""));
-    //   expect(message.body.length, 0);
-    // });
-    //
-    // test('should be get 0 size body from empty body', () {
-    //   Message message = Message(convertUint8data("A\n10\n"));
-    //   expect(message.body.length, 0);
-    // });
-    //
-    // test('should be get 1 size body from exist body', () {
-    //   Message message = Message(convertUint8data("A\n10\na"));
-    //   expect(message.body.length, 1);
-    // });
+  group('header', (){
+    test('should be get header data.', () {
+      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
+      expect(message.header.headerSize, 33);
+      expect(message.header.rawData, "COMMAND=someCommand\nBODY_SIZE=10\n");
+      expect(message.header.bodySize, 10);
+      expect(message.header.command, "someCommand");
+    });
+  });
+
+  group('body', (){
+    test('should be get body data.', () {
+      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
+      expectUint8List(convertUint8data("AAAAAAAAAA"), message.body);
+    });
+
+    test('should be get body data in the middle if the body size is less.', () {
+      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=8\nAAAAAAAAAA"));
+      expectUint8List(convertUint8data("AAAAAAAA"), message.body);
+    });
   });
 }
