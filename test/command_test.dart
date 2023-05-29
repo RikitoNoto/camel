@@ -292,5 +292,10 @@ void messageTest(){
       Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=8\nAAAAAAAAAA"));
       expectUint8List(convertUint8data("AAAAAAAA"), message.body);
     });
+
+    test('should be get body data all if the body size is more.', () {
+      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=15\nAAAAAAAAAA"));
+      expectUint8List(convertUint8data("AAAAAAAAAA"), message.body);
+    });
   });
 }

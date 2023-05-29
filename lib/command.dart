@@ -95,8 +95,12 @@ class Message{
   Message(Uint8List data) {
     header = MessageHeader(data);
     // body start position is the header size + the header size char count + LF
-    int headerStartPosition = header.headerSize + header.headerSize.toString().length + 1;
-    body = Uint8List.fromList(data.sublist(headerStartPosition, headerStartPosition + header.bodySize));
+    final int headerEndPosition = header.headerSize + header.headerSize.toString().length + 1;
+    int bodyEndPosition = headerEndPosition + header.bodySize;
+    if(bodyEndPosition > data.length){
+      bodyEndPosition = data.length;
+    }
+    body = Uint8List.fromList(data.sublist(headerEndPosition, bodyEndPosition));
   }
 
   late final MessageHeader header;
