@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:typed_data' as _i3;
 
-import 'package:camel/command.dart' as _i2;
+import 'package:camel/message.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -46,10 +46,26 @@ class MockMessage extends _i1.Mock implements _i2.Message {
         ),
       ) as _i2.MessageHeader);
   @override
+  set header(_i2.MessageHeader? _header) => super.noSuchMethod(
+        Invocation.setter(
+          #header,
+          _header,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   _i3.Uint8List get body => (super.noSuchMethod(
         Invocation.getter(#body),
         returnValue: _i3.Uint8List(0),
       ) as _i3.Uint8List);
+  @override
+  set body(_i3.Uint8List? _body) => super.noSuchMethod(
+        Invocation.setter(
+          #body,
+          _body,
+        ),
+        returnValueForMissingStub: null,
+      );
 }
 
 /// A class which mocks [MessageHeader].
@@ -66,8 +82,67 @@ class MockMessageHeader extends _i1.Mock implements _i2.MessageHeader {
         returnValue: '',
       ) as String);
   @override
+  set command(String? _command) => super.noSuchMethod(
+        Invocation.setter(
+          #command,
+          _command,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   int get bodySize => (super.noSuchMethod(
         Invocation.getter(#bodySize),
         returnValue: 0,
       ) as int);
+  @override
+  set bodySize(int? _bodySize) => super.noSuchMethod(
+        Invocation.setter(
+          #bodySize,
+          _bodySize,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  int get headerSize => (super.noSuchMethod(
+        Invocation.getter(#headerSize),
+        returnValue: 0,
+      ) as int);
+  @override
+  set headerSize(int? _headerSize) => super.noSuchMethod(
+        Invocation.setter(
+          #headerSize,
+          _headerSize,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  String get rawData => (super.noSuchMethod(
+        Invocation.getter(#rawData),
+        returnValue: '',
+      ) as String);
+  @override
+  set rawData(String? _rawData) => super.noSuchMethod(
+        Invocation.setter(
+          #rawData,
+          _rawData,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  String? parseHeaderSection(
+    String? header,
+    String? section,
+  ) =>
+      (super.noSuchMethod(Invocation.method(
+        #parseHeaderSection,
+        [
+          header,
+          section,
+        ],
+      )) as String?);
+  @override
+  String? parseHeaderSize(String? src) => (super.noSuchMethod(Invocation.method(
+        #parseHeaderSize,
+        [src],
+      )) as String?);
 }

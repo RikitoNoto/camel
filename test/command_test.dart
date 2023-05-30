@@ -7,6 +7,7 @@ import 'package:mockito/annotations.dart';
 
 import 'command_test.mocks.dart';
 import 'package:camel/command.dart';
+import 'package:camel/message.dart';
 
 
 @GenerateMocks([Message])
