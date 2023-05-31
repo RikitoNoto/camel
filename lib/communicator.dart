@@ -4,14 +4,19 @@ abstract class ConnectionPoint{
 
 }
 
-abstract class ReceiveData<T> {
-  T get connection;
-  Message get message;
+class CommunicateData<T> {
+  CommunicateData({
+    required this.connection,
+    required this.message
+  });
+
+  final T connection;
+  final Message message;
 }
 
 abstract class Communicator<T>{
-  Future<T?> connect(String to);                // connection then return connection object.
+  Future<T> connect(ConnectionPoint to);                // connection then return connection object.
   Future close();                               // close connection.
-  Future<int> send(T connection, Message data); // send message to the connection.
-  Stream<ReceiveData> listen(ConnectionPoint bind); // listen connect and receive messages.
+  Future<int> send(CommunicateData data); // send message to the connection.
+  Stream<CommunicateData<T>> listen(ConnectionPoint bind); // listen connect and receive messages.
 }
