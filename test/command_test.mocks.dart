@@ -66,6 +66,11 @@ class MockMessage extends _i1.Mock implements _i2.Message {
         ),
         returnValueForMissingStub: null,
       );
+  @override
+  String get message => (super.noSuchMethod(
+        Invocation.getter(#message),
+        returnValue: '',
+      ) as String);
 }
 
 /// A class which mocks [MessageHeader].

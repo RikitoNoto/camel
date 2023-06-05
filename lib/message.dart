@@ -66,6 +66,7 @@ class Message{
 
   late final MessageHeader header;
   late final Uint8List body;
+  String get message => "";
 }
 
 class MessageFormatException implements Exception{

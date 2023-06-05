@@ -4,11 +4,20 @@ import 'package:flutter/foundation.dart';
 import 'communicator.dart';
 import 'message.dart';
 
+class SocketConnectionPoint{
+  SocketConnectionPoint({
+    required this.address,
+    required this.port,
+  });
 
-class Tcp implements Communicator<Socket>{
+  final String address;
+  final int port;
+}
+
+class Tcp implements Communicator<Socket, SocketConnectionPoint>{
   @override
-  Future<Socket> connect(ConnectionPoint to) async{
-    return await _connect("", 0);
+  Future<Socket> connect(SocketConnectionPoint connectionPoint) async{
+    return await _connect(connectionPoint.address, connectionPoint.port);
   }
 
   @override
@@ -17,16 +26,16 @@ class Tcp implements Communicator<Socket>{
   }
 
   @override
-  Future<int> send(CommunicateData data) async{
-    return 0;
+  Future<int> send(CommunicateData<Socket> data) async{
+    data.connection.write("${data.message.message.length}\n${data.message.message}");
+    return Future(() => data.message.message.length);
   }
 
   @override
-  Stream<CommunicateData<Socket>> listen(ConnectionPoint bind) async* {
+  Stream<CommunicateData<Socket>> listen(SocketConnectionPoint bind) async* {
     Socket socket = await _connect("", 0);
     yield CommunicateData<Socket>(connection: socket, message: Message(Uint8List(0)));
   }
-
 
   // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓ for test ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
   Function(dynamic address, int port, {dynamic sourceAddress, int sourcePort, Duration? timeout}) _connect = Socket.connect;
