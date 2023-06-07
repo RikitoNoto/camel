@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'message.dart';
 import 'dart:typed_data';
 
@@ -22,13 +24,18 @@ abstract class CommandFactory{
   }
 
   static Command? getCommand(Message receivedData){
-    for(Command command in _commands.values){
-      // if match the command, return that command.
-      if(command.command == receivedData.header.command){
-        return command;
-      }
+    if(kDebugMode && isTest){
+      return getCommandSpy;
     }
-    return null;
+    else{
+      for(Command command in _commands.values){
+        // if match the command, return that command.
+        if(command.command == receivedData.header.command){
+          return command;
+        }
+      }
+      return null;
+    }
   }
 
   static void registerCommand(Command command){
@@ -38,4 +45,20 @@ abstract class CommandFactory{
   static void clearCommands(){
     _commands.clear();
   }
+
+  // ↓↓↓↓↓↓↓↓↓↓ for test ↓↓↓↓↓↓↓↓↓↓
+  static bool isTest = false;
+  static Command? getCommandSpy;
+  static void setupTest(){
+    isTest = true;
+  }
+
+  static void teardownTest(){
+    isTest = false;
+  }
+
+  static void setGetCommandSpy(Command? command){
+    getCommandSpy = command;
+  }
+
 }

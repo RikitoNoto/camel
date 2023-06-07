@@ -14,5 +14,5 @@ abstract class Communicator<T, C>{
   Future<T> connect(C connectionPoint);         // connection then return connection object.
   Future close();                               // close connection.
   Future<int> send(CommunicateData<T> data);       // send message to the connection.
-  Stream<CommunicateData<T>> listen(C bind); // listen connect and receive messages.
+  Future<Stream<CommunicateData<T>>> listen(C bind); // listen connect and receive messages.
 }

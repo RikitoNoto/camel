@@ -8,6 +8,7 @@ import 'dart:convert' as _i3;
 import 'dart:io' as _i2;
 import 'dart:typed_data' as _i6;
 
+import 'package:camel/command.dart' as _i7;
 import 'package:camel/message.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -64,8 +65,28 @@ class _FakeFuture_3<T> extends _i1.SmartFake implements _i4.Future<T> {
         );
 }
 
-class _FakeMessageHeader_4 extends _i1.SmartFake implements _i5.MessageHeader {
-  _FakeMessageHeader_4(
+class _FakeSocket_4 extends _i1.SmartFake implements _i2.Socket {
+  _FakeSocket_4(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeServerSocket_5 extends _i1.SmartFake implements _i2.ServerSocket {
+  _FakeServerSocket_5(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeMessageHeader_6 extends _i1.SmartFake implements _i5.MessageHeader {
+  _FakeMessageHeader_6(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -640,6 +661,464 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
       ) as _i4.Future<dynamic>);
 }
 
+/// A class which mocks [ServerSocket].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockServerSocket extends _i1.Mock implements _i2.ServerSocket {
+  MockServerSocket() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  int get port => (super.noSuchMethod(
+        Invocation.getter(#port),
+        returnValue: 0,
+      ) as int);
+  @override
+  _i2.InternetAddress get address => (super.noSuchMethod(
+        Invocation.getter(#address),
+        returnValue: _FakeInternetAddress_0(
+          this,
+          Invocation.getter(#address),
+        ),
+      ) as _i2.InternetAddress);
+  @override
+  bool get isBroadcast => (super.noSuchMethod(
+        Invocation.getter(#isBroadcast),
+        returnValue: false,
+      ) as bool);
+  @override
+  _i4.Future<int> get length => (super.noSuchMethod(
+        Invocation.getter(#length),
+        returnValue: _i4.Future<int>.value(0),
+      ) as _i4.Future<int>);
+  @override
+  _i4.Future<bool> get isEmpty => (super.noSuchMethod(
+        Invocation.getter(#isEmpty),
+        returnValue: _i4.Future<bool>.value(false),
+      ) as _i4.Future<bool>);
+  @override
+  _i4.Future<_i2.Socket> get first => (super.noSuchMethod(
+        Invocation.getter(#first),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.getter(#first),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<_i2.Socket> get last => (super.noSuchMethod(
+        Invocation.getter(#last),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.getter(#last),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<_i2.Socket> get single => (super.noSuchMethod(
+        Invocation.getter(#single),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.getter(#single),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<_i2.ServerSocket> close() => (super.noSuchMethod(
+        Invocation.method(
+          #close,
+          [],
+        ),
+        returnValue: _i4.Future<_i2.ServerSocket>.value(_FakeServerSocket_5(
+          this,
+          Invocation.method(
+            #close,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.ServerSocket>);
+  @override
+  _i4.Stream<_i2.Socket> asBroadcastStream({
+    void Function(_i4.StreamSubscription<_i2.Socket>)? onListen,
+    void Function(_i4.StreamSubscription<_i2.Socket>)? onCancel,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #asBroadcastStream,
+          [],
+          {
+            #onListen: onListen,
+            #onCancel: onCancel,
+          },
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.StreamSubscription<_i2.Socket> listen(
+    void Function(_i2.Socket)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #listen,
+          [onData],
+          {
+            #onError: onError,
+            #onDone: onDone,
+            #cancelOnError: cancelOnError,
+          },
+        ),
+        returnValue: _FakeStreamSubscription_2<_i2.Socket>(
+          this,
+          Invocation.method(
+            #listen,
+            [onData],
+            {
+              #onError: onError,
+              #onDone: onDone,
+              #cancelOnError: cancelOnError,
+            },
+          ),
+        ),
+      ) as _i4.StreamSubscription<_i2.Socket>);
+  @override
+  _i4.Stream<_i2.Socket> where(bool Function(_i2.Socket)? test) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #where,
+          [test],
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Stream<S> map<S>(S Function(_i2.Socket)? convert) => (super.noSuchMethod(
+        Invocation.method(
+          #map,
+          [convert],
+        ),
+        returnValue: _i4.Stream<S>.empty(),
+      ) as _i4.Stream<S>);
+  @override
+  _i4.Stream<E> asyncMap<E>(_i4.FutureOr<E> Function(_i2.Socket)? convert) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #asyncMap,
+          [convert],
+        ),
+        returnValue: _i4.Stream<E>.empty(),
+      ) as _i4.Stream<E>);
+  @override
+  _i4.Stream<E> asyncExpand<E>(_i4.Stream<E>? Function(_i2.Socket)? convert) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #asyncExpand,
+          [convert],
+        ),
+        returnValue: _i4.Stream<E>.empty(),
+      ) as _i4.Stream<E>);
+  @override
+  _i4.Stream<_i2.Socket> handleError(
+    Function? onError, {
+    bool Function(dynamic)? test,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #handleError,
+          [onError],
+          {#test: test},
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Stream<S> expand<S>(Iterable<S> Function(_i2.Socket)? convert) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #expand,
+          [convert],
+        ),
+        returnValue: _i4.Stream<S>.empty(),
+      ) as _i4.Stream<S>);
+  @override
+  _i4.Future<dynamic> pipe(_i4.StreamConsumer<_i2.Socket>? streamConsumer) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #pipe,
+          [streamConsumer],
+        ),
+        returnValue: _i4.Future<dynamic>.value(),
+      ) as _i4.Future<dynamic>);
+  @override
+  _i4.Stream<S> transform<S>(
+          _i4.StreamTransformer<_i2.Socket, S>? streamTransformer) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #transform,
+          [streamTransformer],
+        ),
+        returnValue: _i4.Stream<S>.empty(),
+      ) as _i4.Stream<S>);
+  @override
+  _i4.Future<_i2.Socket> reduce(
+          _i2.Socket Function(
+            _i2.Socket,
+            _i2.Socket,
+          )? combine) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #reduce,
+          [combine],
+        ),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.method(
+            #reduce,
+            [combine],
+          ),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<S> fold<S>(
+    S? initialValue,
+    S Function(
+      S,
+      _i2.Socket,
+    )? combine,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fold,
+          [
+            initialValue,
+            combine,
+          ],
+        ),
+        returnValue: _FakeFuture_3<S>(
+          this,
+          Invocation.method(
+            #fold,
+            [
+              initialValue,
+              combine,
+            ],
+          ),
+        ),
+      ) as _i4.Future<S>);
+  @override
+  _i4.Future<String> join([String? separator = r'']) => (super.noSuchMethod(
+        Invocation.method(
+          #join,
+          [separator],
+        ),
+        returnValue: _i4.Future<String>.value(''),
+      ) as _i4.Future<String>);
+  @override
+  _i4.Future<bool> contains(Object? needle) => (super.noSuchMethod(
+        Invocation.method(
+          #contains,
+          [needle],
+        ),
+        returnValue: _i4.Future<bool>.value(false),
+      ) as _i4.Future<bool>);
+  @override
+  _i4.Future<dynamic> forEach(void Function(_i2.Socket)? action) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #forEach,
+          [action],
+        ),
+        returnValue: _i4.Future<dynamic>.value(),
+      ) as _i4.Future<dynamic>);
+  @override
+  _i4.Future<bool> every(bool Function(_i2.Socket)? test) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #every,
+          [test],
+        ),
+        returnValue: _i4.Future<bool>.value(false),
+      ) as _i4.Future<bool>);
+  @override
+  _i4.Future<bool> any(bool Function(_i2.Socket)? test) => (super.noSuchMethod(
+        Invocation.method(
+          #any,
+          [test],
+        ),
+        returnValue: _i4.Future<bool>.value(false),
+      ) as _i4.Future<bool>);
+  @override
+  _i4.Stream<R> cast<R>() => (super.noSuchMethod(
+        Invocation.method(
+          #cast,
+          [],
+        ),
+        returnValue: _i4.Stream<R>.empty(),
+      ) as _i4.Stream<R>);
+  @override
+  _i4.Future<List<_i2.Socket>> toList() => (super.noSuchMethod(
+        Invocation.method(
+          #toList,
+          [],
+        ),
+        returnValue: _i4.Future<List<_i2.Socket>>.value(<_i2.Socket>[]),
+      ) as _i4.Future<List<_i2.Socket>>);
+  @override
+  _i4.Future<Set<_i2.Socket>> toSet() => (super.noSuchMethod(
+        Invocation.method(
+          #toSet,
+          [],
+        ),
+        returnValue: _i4.Future<Set<_i2.Socket>>.value(<_i2.Socket>{}),
+      ) as _i4.Future<Set<_i2.Socket>>);
+  @override
+  _i4.Future<E> drain<E>([E? futureValue]) => (super.noSuchMethod(
+        Invocation.method(
+          #drain,
+          [futureValue],
+        ),
+        returnValue: _FakeFuture_3<E>(
+          this,
+          Invocation.method(
+            #drain,
+            [futureValue],
+          ),
+        ),
+      ) as _i4.Future<E>);
+  @override
+  _i4.Stream<_i2.Socket> take(int? count) => (super.noSuchMethod(
+        Invocation.method(
+          #take,
+          [count],
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Stream<_i2.Socket> takeWhile(bool Function(_i2.Socket)? test) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #takeWhile,
+          [test],
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Stream<_i2.Socket> skip(int? count) => (super.noSuchMethod(
+        Invocation.method(
+          #skip,
+          [count],
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Stream<_i2.Socket> skipWhile(bool Function(_i2.Socket)? test) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #skipWhile,
+          [test],
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Stream<_i2.Socket> distinct(
+          [bool Function(
+            _i2.Socket,
+            _i2.Socket,
+          )? equals]) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #distinct,
+          [equals],
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+  @override
+  _i4.Future<_i2.Socket> firstWhere(
+    bool Function(_i2.Socket)? test, {
+    _i2.Socket Function()? orElse,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #firstWhere,
+          [test],
+          {#orElse: orElse},
+        ),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.method(
+            #firstWhere,
+            [test],
+            {#orElse: orElse},
+          ),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<_i2.Socket> lastWhere(
+    bool Function(_i2.Socket)? test, {
+    _i2.Socket Function()? orElse,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #lastWhere,
+          [test],
+          {#orElse: orElse},
+        ),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.method(
+            #lastWhere,
+            [test],
+            {#orElse: orElse},
+          ),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<_i2.Socket> singleWhere(
+    bool Function(_i2.Socket)? test, {
+    _i2.Socket Function()? orElse,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #singleWhere,
+          [test],
+          {#orElse: orElse},
+        ),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.method(
+            #singleWhere,
+            [test],
+            {#orElse: orElse},
+          ),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Future<_i2.Socket> elementAt(int? index) => (super.noSuchMethod(
+        Invocation.method(
+          #elementAt,
+          [index],
+        ),
+        returnValue: _i4.Future<_i2.Socket>.value(_FakeSocket_4(
+          this,
+          Invocation.method(
+            #elementAt,
+            [index],
+          ),
+        )),
+      ) as _i4.Future<_i2.Socket>);
+  @override
+  _i4.Stream<_i2.Socket> timeout(
+    Duration? timeLimit, {
+    void Function(_i4.EventSink<_i2.Socket>)? onTimeout,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #timeout,
+          [timeLimit],
+          {#onTimeout: onTimeout},
+        ),
+        returnValue: _i4.Stream<_i2.Socket>.empty(),
+      ) as _i4.Stream<_i2.Socket>);
+}
+
 /// A class which mocks [Message].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -651,7 +1130,7 @@ class MockMessage extends _i1.Mock implements _i5.Message {
   @override
   _i5.MessageHeader get header => (super.noSuchMethod(
         Invocation.getter(#header),
-        returnValue: _FakeMessageHeader_4(
+        returnValue: _FakeMessageHeader_6(
           this,
           Invocation.getter(#header),
         ),
@@ -682,4 +1161,36 @@ class MockMessage extends _i1.Mock implements _i5.Message {
         Invocation.getter(#message),
         returnValue: '',
       ) as String);
+}
+
+/// A class which mocks [CommandFactory].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCommandFactory extends _i1.Mock implements _i7.CommandFactory {
+  MockCommandFactory() {
+    _i1.throwOnMissingStub(this);
+  }
+}
+
+/// A class which mocks [Command].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCommand extends _i1.Mock implements _i7.Command {
+  MockCommand() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  String get command => (super.noSuchMethod(
+        Invocation.getter(#command),
+        returnValue: '',
+      ) as String);
+  @override
+  void execute(_i6.Uint8List? data) => super.noSuchMethod(
+        Invocation.method(
+          #execute,
+          [data],
+        ),
+        returnValueForMissingStub: null,
+      );
 }

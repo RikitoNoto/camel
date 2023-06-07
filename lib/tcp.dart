@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:camel/command.dart';
 import 'package:flutter/foundation.dart';
 
 import 'communicator.dart';
@@ -32,9 +35,15 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint>{
   }
 
   @override
-  Stream<CommunicateData<Socket>> listen(SocketConnectionPoint bind) async* {
-    Socket socket = await _connect("", 0);
-    yield CommunicateData<Socket>(connection: socket, message: Message(Uint8List(0)));
+  Future<Stream<CommunicateData<Socket>>> listen(SocketConnectionPoint bind) async {
+    final StreamController<CommunicateData<Socket>> controller = StreamController();
+    ServerSocket serverSocket = await _bind(bind.address, bind.port);
+    serverSocket.listen((Socket socket){
+      socket.listen((Uint8List data) {
+        controller.sink.add(CommunicateData(connection: socket, message: Message(data)));
+      });
+    });
+    return controller.stream;
   }
 
   // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓ for test ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
