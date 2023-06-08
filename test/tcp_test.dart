@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'tcp.mocks.dart';
+import 'tcp_test.mocks.dart';
 
 import 'package:camel/tcp.dart';
 import 'package:camel/message.dart';
