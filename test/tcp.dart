@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -145,25 +146,18 @@ void useLibraryTest() {
         // when connection
         when(spy.socket?.listen(any)).thenAnswer((Invocation invocation) {
           final void Function(Uint8List) receiveCallback = invocation.positionalArguments[0];
-          // MockCommand mockCommand = MockCommand();
-          //
-          // CommandFactory.setupTest();
-          // CommandFactory.setGetCommandSpy(mockCommand);
-          // // check execute command.
-          // when(mockCommand.execute(any)).thenAnswer((realInvocation) {
-          //   expect(realInvocation.positionalArguments[0], Uint8List.fromList(utf8.encode("body"))); // it should be the body of the message.
-          // });
-
           receiveCallback(convertUint8data("32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
-          // verify(mockCommand.execute(any));
-          // CommandFactory.teardownTest();
+          return StreamSubscriptionStub<Uint8List>();
         });
         connectCallback(spy.socket!);  // connection
         verify(spy.socket?.listen(any));
+        return StreamSubscriptionStub<Socket>();
       });
 
       await for(CommunicateData<Socket> data in await spy.tcp.listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))){
-        print(data);
+        expect(data.message.body, Uint8List.fromList(utf8.encode("body")));
+        expect(data.connection, spy.socket);
+        break;
       }
 
       verify(spy.serverSocket?.listen(any));
@@ -171,4 +165,27 @@ void useLibraryTest() {
       expect(spy.bindPort, 1000);
     });
   });
+}
+
+class StreamSubscriptionStub<T> implements StreamSubscription<T>{
+  @override
+  Future<void> cancel() async{
+    return ;
+  }
+
+  @override void onData(void handleData(T data)?){}
+  @override void onError(Function? handleError) {}
+  @override void onDone(void handleDone()?){}
+  @override void pause([Future<void>? resumeSignal]) {}
+  @override void resume(){}
+  @override bool get isPaused{ return true; }
+  @override Future<E> asFuture<E>([E? futureValue])async{
+    E resultValue;
+    if (futureValue == null) {
+      resultValue = futureValue as dynamic;
+    } else {
+      resultValue = futureValue;
+    }
+    return Future.value(resultValue);
+  }
 }
