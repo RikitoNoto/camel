@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:camel/command.dart';
 import 'package:camel/communicator.dart';
@@ -28,20 +27,20 @@ void main() {
 }
 
 class ConnectSpy {
-  ConnectSpy({required this.tcp, this.socket});
+  ConnectSpy({required this.tcp, required this.socket});
   String? connectAddress;
   int? connectPort;
   final Tcp tcp;
-  final MockSocket? socket;
+  final MockSocket socket;
 }
 
 class ListenSpy {
-  ListenSpy({required this.tcp, this.socket, this.serverSocket});
+  ListenSpy({required this.tcp, required this.socket, required this.serverSocket});
   String? bindAddress;
   int? bindPort;
   final Tcp tcp;
-  final MockSocket? socket;
-  final MockServerSocket? serverSocket;
+  final MockSocket socket;
+  final MockServerSocket serverSocket;
 }
 
 Future<ConnectSpy> connectWithMock({
@@ -52,11 +51,11 @@ Future<ConnectSpy> connectWithMock({
   Tcp tcp = Tcp();
   ConnectSpy spy = ConnectSpy(tcp: tcp, socket: mockSocket ?? MockSocket());
 
-  ConnectFunc connectMock = (dynamic address, int port, {dynamic sourceAddress, int sourcePort=0, Duration? timeout}){
+  Future<Socket> connectMock(dynamic address, int port, {dynamic sourceAddress, int sourcePort=0, Duration? timeout}) async {
     spy.connectAddress = address;
     spy.connectPort = port;
     return spy.socket;
-  };
+  }
 
   tcp.setConnectMock(connectMock);
   await tcp.connect(SocketConnectionPoint(address: address, port: port));
@@ -71,11 +70,11 @@ Future<ListenSpy> bindMock({
   Tcp tcp = Tcp();
   ListenSpy spy = ListenSpy(tcp: tcp, socket: mockSocket ?? MockSocket(), serverSocket: mockServerSocket ?? MockServerSocket());
 
-  BindFunc bindMock = (dynamic address, int port, {int backlog=0, bool v6Only=false, bool shared=false,}){
+  Future<ServerSocket> bindMock (dynamic address, int port, {int backlog=0, bool v6Only=false, bool shared=false,}) async{
     spy.bindAddress = address;
     spy.bindPort = port;
     return spy.serverSocket;
-  };
+  }
 
   tcp.setBindMock(bindMock);
 
@@ -97,9 +96,9 @@ void useLibraryTest() {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket!, message: mockMessage));
+      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
 
-      verify(spy.socket?.write("0\n"));
+      verify(spy.socket.write("0\n"));
       expect(sentByte, 0);
     });
 
@@ -107,9 +106,9 @@ void useLibraryTest() {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("message");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket!, message: mockMessage));
+      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
 
-      verify(spy.socket?.write("7\nmessage"));
+      verify(spy.socket.write("7\nmessage"));
       expect(sentByte, 7);
     });
   });
@@ -119,9 +118,9 @@ void useLibraryTest() {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket!, message: mockMessage));
+      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
 
-      verify(spy.socket?.write("0\n"));
+      verify(spy.socket.write("0\n"));
       expect(sentByte, 0);
     });
 
@@ -129,9 +128,9 @@ void useLibraryTest() {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("message");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket!, message: mockMessage));
+      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
 
-      verify(spy.socket?.write("7\nmessage"));
+      verify(spy.socket.write("7\nmessage"));
       expect(sentByte, 7);
     });
   });
@@ -140,17 +139,17 @@ void useLibraryTest() {
     test("should be execute received message command", () async{
       ListenSpy spy = await bindMock();
 
-      when(spy.serverSocket?.listen(any)).thenAnswer((Invocation invocation) {
+      when(spy.serverSocket.listen(any)).thenAnswer((Invocation invocation) {
         final void Function(Socket) connectCallback = invocation.positionalArguments[0];
 
         // when connection
-        when(spy.socket?.listen(any)).thenAnswer((Invocation invocation) {
+        when(spy.socket.listen(any)).thenAnswer((Invocation invocation) {
           final void Function(Uint8List) receiveCallback = invocation.positionalArguments[0];
           receiveCallback(convertUint8data("32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
           return StreamSubscriptionStub<Uint8List>();
         });
-        connectCallback(spy.socket!);  // connection
-        verify(spy.socket?.listen(any));
+        connectCallback(spy.socket);  // connection
+        verify(spy.socket.listen(any));
         return StreamSubscriptionStub<Socket>();
       });
 
@@ -160,7 +159,7 @@ void useLibraryTest() {
         break;
       }
 
-      verify(spy.serverSocket?.listen(any));
+      verify(spy.serverSocket.listen(any));
       expect(spy.bindAddress, "127.0.0.1");
       expect(spy.bindPort, 1000);
     });
@@ -173,9 +172,9 @@ class StreamSubscriptionStub<T> implements StreamSubscription<T>{
     return ;
   }
 
-  @override void onData(void handleData(T data)?){}
+  @override void onData(void Function(T)? handleData){}
   @override void onError(Function? handleError) {}
-  @override void onDone(void handleDone()?){}
+  @override void onDone(void Function()? handleDone){}
   @override void pause([Future<void>? resumeSignal]) {}
   @override void resume(){}
   @override bool get isPaused{ return true; }
