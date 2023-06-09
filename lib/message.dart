@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-class MessageHeader{
+class MessageHeader {
   static const String delimiter = "\n";
 
   late final String command;
@@ -9,56 +9,56 @@ class MessageHeader{
   late final int headerSize;
   late final String rawData;
 
-  MessageHeader(Uint8List data){
+  MessageHeader(Uint8List data) {
     String? header = parseHeaderSize(utf8.decode(data));
 
-    if(header == null) {
+    if (header == null) {
       rawData = "";
       return;
-    }
-    else{
+    } else {
       rawData = header;
     }
 
     command = parseHeaderSection(header, "COMMAND") ?? "";
     bodySize = int.parse(parseHeaderSection(header, "BODY_SIZE") ?? "0");
-
   }
 
-  String? parseHeaderSection(String header, String section){
-    RegExpMatch? valueMatch = RegExp('^$section=(.*?)\$', dotAll: true, multiLine: true).firstMatch(header);
+  String? parseHeaderSection(String header, String section) {
+    RegExpMatch? valueMatch =
+        RegExp('^$section=(.*?)\$', dotAll: true, multiLine: true)
+            .firstMatch(header);
     return valueMatch?.group(1);
   }
 
-  String? parseHeaderSize(String src){
-    RegExpMatch? headerSizeMatch = RegExp('^([0-9]+)(?:$delimiter(.*))?', dotAll: true).firstMatch(src);
+  String? parseHeaderSize(String src) {
+    RegExpMatch? headerSizeMatch =
+        RegExp('^([0-9]+)(?:$delimiter(.*))?', dotAll: true).firstMatch(src);
     final String? headerSizeStr = headerSizeMatch?.group(1);
 
     // check it was not match.
     // check it is a number.
-    if((headerSizeStr == null)){
+    if ((headerSizeStr == null)) {
       throw const MessageFormatException('Could not find body size.');
-    }
-    else{
+    } else {
       headerSize = int.parse(headerSizeStr);
     }
 
-    try{
+    try {
       return headerSizeMatch?.group(2)?.substring(0, headerSize);
-    }
-    on RangeError {
+    } on RangeError {
       return headerSizeMatch?.group(2)?.substring(0);
     }
   }
 }
 
-class Message{
+class Message {
   Message(Uint8List data) {
     header = MessageHeader(data);
     // body start position is the header size + the header size char count + LF
-    final int headerEndPosition = header.headerSize + header.headerSize.toString().length + 1;
+    final int headerEndPosition =
+        header.headerSize + header.headerSize.toString().length + 1;
     int bodyEndPosition = headerEndPosition + header.bodySize;
-    if(bodyEndPosition > data.length){
+    if (bodyEndPosition > data.length) {
       bodyEndPosition = data.length;
     }
     body = Uint8List.fromList(data.sublist(headerEndPosition, bodyEndPosition));
@@ -69,7 +69,7 @@ class Message{
   String get message => "";
 }
 
-class MessageFormatException implements Exception{
+class MessageFormatException implements Exception {
   const MessageFormatException(this.message);
   final String message;
 
