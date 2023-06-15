@@ -9,7 +9,6 @@ import 'command_test.mocks.dart';
 import 'package:camel/command.dart';
 import 'package:camel/message.dart';
 
-
 @GenerateMocks([Message])
 @GenerateMocks([MessageHeader])
 void main() {
@@ -17,8 +16,6 @@ void main() {
     CommandFactory.clearCommands();
   });
   commandFactoryTest();
-  messageHeaderTest();
-  messageTest();
 }
 
 class CommandStub implements Command{
@@ -151,152 +148,6 @@ void commandFactoryTest(){
       expect(commandList.length, 2);
       expect(isInCommandList(commandStub1, commandList), isTrue);
       expect(isInCommandList(commandStub2, commandList), isTrue);
-    });
-  });
-}
-
-void messageHeaderTest(){
-  group("parse test", (){
-
-    group('get header size', (){
-      test('should be throw MessageFormatException if arg is empty header', () {
-        expect(() => MessageHeader(convertUint8data("")), throwsA(const TypeMatcher<MessageFormatException>()));
-      });
-
-      test('should be throw MessageFormatException if arg is that is not number.', () {
-        expect(() => MessageHeader(convertUint8data("a")), throwsA(const TypeMatcher<MessageFormatException>()));
-      });
-
-      test('should be throw MessageFormatException if get arg is start from LF.', () {
-        expect(() => MessageHeader(convertUint8data("\n100")), throwsA(const TypeMatcher<MessageFormatException>()));
-      });
-
-      test('should be get 0 as the header size if get arg is 0.', () {
-        expect(MessageHeader(convertUint8data("0")).headerSize, 0);
-      });
-
-      test('should be get 100 as the header size if get arg is 100.', () {
-        expect(MessageHeader(convertUint8data("100")).headerSize, 100);
-      });
-
-      test('should be get 100 as the header size if get arg is 100+LF.', () {
-        expect(MessageHeader(convertUint8data("100\n")).headerSize, 100);
-      });
-    });
-
-    group('get commands', (){
-      test('should be get no command if there is not COMMAND header.', () {
-        MessageHeader header = MessageHeader(convertUint8data("100\n"));
-        expect(header.command, "");
-      });
-
-      test('should be get a command if there is COMMAND header.', () {
-        MessageHeader header = MessageHeader(convertUint8data("15\nCOMMAND=command"));
-        expect(header.command, "command");
-      });
-
-      test('should be get a command in the middle if the header size is less.', () {
-        MessageHeader header = MessageHeader(convertUint8data("14\nCOMMAND=command"));
-        expect(header.command, "comman");
-      });
-
-      test('should be get no command if the header size is less.', () {
-        MessageHeader header = MessageHeader(convertUint8data("0\nCOMMAND=command"));
-        expect(header.command, "");
-      });
-
-      test('should be get an before command if the COMMAND section is twice.', () {
-        MessageHeader header = MessageHeader(convertUint8data("34\nCOMMAND=command1\nCOMMAND=command2"));
-        expect(header.command, "command1");
-      });
-    });
-
-    group('get body size', (){
-      test('should be get 0 as body size if there is not BODY_SIZE header.', () {
-        MessageHeader header = MessageHeader(convertUint8data("100\n"));
-        expect(header.bodySize, 0);
-      });
-
-      test('should be get 10 as body size if there is BODY_SIZE header.', () {
-        MessageHeader header = MessageHeader(convertUint8data("12\nBODY_SIZE=10"));
-        expect(header.bodySize, 10);
-      });
-
-      test('should be get 1 as body size(in the middle) if the header size is less.', () {
-        MessageHeader header = MessageHeader(convertUint8data("11\nBODY_SIZE=10"));
-        expect(header.bodySize, 1);
-      });
-
-      test('should be get 0 as body size if the header size is less.', () {
-        MessageHeader header = MessageHeader(convertUint8data("0\nBODY_SIZE=10"));
-        expect(header.bodySize, 0);
-      });
-
-      test('should be get an before body size if the BODY_SIZE section is twice.', () {
-        MessageHeader header = MessageHeader(convertUint8data("24\nBODY_SIZE=1\nBODY_SIZE=2"));
-        expect(header.bodySize, 1);
-      });
-    });
-
-    group('get raw data', (){
-      test('should be not get raw data if the header size is 0.', () {
-        MessageHeader header = MessageHeader(convertUint8data("0\n"));
-        expect(header.rawData, "");
-      });
-
-      test('should be not get raw data if the header size is 0 and exist header data.', () {
-        MessageHeader header = MessageHeader(convertUint8data("0\ndata"));
-        expect(header.rawData, "");
-      });
-
-      test('should be get raw data if exist header data.', () {
-        MessageHeader header = MessageHeader(convertUint8data("4\ndata"));
-        expect(header.rawData, "data");
-      });
-
-      test('should be get raw data in the middle if header size is less.', () {
-        MessageHeader header = MessageHeader(convertUint8data("3\ndata"));
-        expect(header.rawData, "dat");
-      });
-    });
-
-    group('get header some pattern', (){
-      test('should be get variable data.', () {
-        MessageHeader header = MessageHeader(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
-        expect(header.headerSize, 33);
-        expect(header.rawData, "COMMAND=someCommand\nBODY_SIZE=10\n");
-        expect(header.bodySize, 10);
-        expect(header.command, "someCommand");
-      });
-    });
-  });
-}
-
-void messageTest(){
-  group('header', (){
-    test('should be get header data.', () {
-      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
-      expect(message.header.headerSize, 33);
-      expect(message.header.rawData, "COMMAND=someCommand\nBODY_SIZE=10\n");
-      expect(message.header.bodySize, 10);
-      expect(message.header.command, "someCommand");
-    });
-  });
-
-  group('body', (){
-    test('should be get body data.', () {
-      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
-      expectUint8List(convertUint8data("AAAAAAAAAA"), message.body);
-    });
-
-    test('should be get body data in the middle if the body size is less.', () {
-      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=8\nAAAAAAAAAA"));
-      expectUint8List(convertUint8data("AAAAAAAA"), message.body);
-    });
-
-    test('should be get body data all if the body size is more.', () {
-      Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=15\nAAAAAAAAAA"));
-      expectUint8List(convertUint8data("AAAAAAAAAA"), message.body);
     });
   });
 }

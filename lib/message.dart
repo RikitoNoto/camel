@@ -1,6 +1,22 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+enum Sections{
+  command,
+  bodySize,
+}
+
+extension SectionsChars on Sections {
+  String get name {
+    switch (this) {
+      case Sections.command:
+        return 'COMMAND';
+      case Sections.bodySize:
+        return 'BODY_SIZE';
+    }
+  }
+}
+
 class MessageHeader {
   static const String delimiter = "\n";
 
@@ -19,8 +35,15 @@ class MessageHeader {
       rawData = header;
     }
 
-    command = parseHeaderSection(header, "COMMAND") ?? "";
-    bodySize = int.parse(parseHeaderSection(header, "BODY_SIZE") ?? "0");
+    command = parseHeaderSection(header, Sections.command.name) ?? "";
+    bodySize = int.parse(parseHeaderSection(header, Sections.bodySize.name) ?? "0");
+  }
+
+  MessageHeader.fromParam({
+    required this.command,
+    required this.bodySize,
+  }){
+    headerSize = "${Sections.command.name}=${command}\n${Sections.bodySize.name}=${bodySize}\n".length;
   }
 
   String? parseHeaderSection(String header, String section) {
@@ -52,6 +75,10 @@ class MessageHeader {
 }
 
 class Message {
+  late final MessageHeader header;
+  late final Uint8List body;
+  String get message => "";
+
   Message(Uint8List data) {
     header = MessageHeader(data);
     // body start position is the header size + the header size char count + LF
@@ -64,9 +91,12 @@ class Message {
     body = Uint8List.fromList(data.sublist(headerEndPosition, bodyEndPosition));
   }
 
-  late final MessageHeader header;
-  late final Uint8List body;
-  String get message => "";
+  Message.fromBody({
+    required String command,
+    required this.body,
+  }){
+    header = MessageHeader.fromParam(command: command, bodySize: body.length);
+  }
 }
 
 class MessageFormatException implements Exception {
