@@ -43,7 +43,7 @@ class MessageHeader {
     required this.command,
     required this.bodySize,
   }){
-    headerSize = "${Sections.command.name}=${command}\n${Sections.bodySize.name}=${bodySize}\n".length;
+    headerSize = "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n".length;
   }
 
   String? parseHeaderSection(String header, String section) {

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -7,7 +6,6 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
 import 'message_test.mocks.dart';
-import 'package:camel/command.dart';
 import 'package:camel/message.dart';
 
 
