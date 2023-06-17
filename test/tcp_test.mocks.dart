@@ -1193,12 +1193,12 @@ class MockMessage extends _i1.Mock implements _i5.Message {
         returnValueForMissingStub: null,
       );
   @override
-  _i6.Uint8List get body => (super.noSuchMethod(
+  String get body => (super.noSuchMethod(
         Invocation.getter(#body),
-        returnValue: _i6.Uint8List(0),
-      ) as _i6.Uint8List);
+        returnValue: '',
+      ) as String);
   @override
-  set body(_i6.Uint8List? _body) => super.noSuchMethod(
+  set body(String? _body) => super.noSuchMethod(
         Invocation.setter(
           #body,
           _body,

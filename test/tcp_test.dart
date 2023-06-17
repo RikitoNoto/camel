@@ -154,7 +154,7 @@ void useLibraryTest() {
       });
 
       await for(CommunicateData<Socket> data in await spy.tcp.listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))){
-        expect(data.message.body, Uint8List.fromList(utf8.encode("body")));
+        expect(data.message.body, "body");
         expect(data.connection, spy.socket);
         break;
       }

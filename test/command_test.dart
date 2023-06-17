@@ -32,7 +32,7 @@ class CommandStub implements Command{
 
 MockMessage constructMessageMock({
   MessageHeader? header,
-  Uint8List? body,
+  String? body,
   String? command,
   int? bodySize,
 }){
@@ -55,7 +55,7 @@ MockMessage constructMessageMock({
   });
 
   when(mockMessage.body).thenAnswer((realInvocation) {
-    return body ?? Uint8List(0);
+    return body ?? "";
   });
 
   return mockMessage;

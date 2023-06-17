@@ -17,11 +17,12 @@ void main() {
   messageHeaderTest();
   messageFormatTest();
   messageConstructFromSendTest();
+  convertBinDataTest();
 }
 
 MockMessage constructMessageMock({
   MessageHeader? header,
-  Uint8List? body,
+  String? body,
   String? command,
   int? bodySize,
 }){
@@ -44,7 +45,7 @@ MockMessage constructMessageMock({
   });
 
   when(mockMessage.body).thenAnswer((realInvocation) {
-    return body ?? Uint8List(0);
+    return body ?? "";
   });
 
   return mockMessage;
@@ -197,28 +198,28 @@ void messageFormatTest(){
   group('body', (){
     test('should be get body data.', () {
       Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=10\nAAAAAAAAAA"));
-      expectUint8List(convertUint8data("AAAAAAAAAA"), message.body);
+      expect("AAAAAAAAAA", message.body);
     });
 
     test('should be get body data in the middle if the body size is less.', () {
       Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=8\nAAAAAAAAAA"));
-      expectUint8List(convertUint8data("AAAAAAAA"), message.body);
+      expect("AAAAAAAA", message.body);
     });
 
     test('should be get body data all if the body size is more.', () {
       Message message = Message(convertUint8data("33\nCOMMAND=someCommand\nBODY_SIZE=15\nAAAAAAAAAA"));
-      expectUint8List(convertUint8data("AAAAAAAAAA"), message.body);
+      expect("AAAAAAAAAA", message.body);
     });
   });
 }
 
 Message constructMessageFromBody({required String command, required String body}){
-  return Message.fromBody(command: command, body: Uint8List.fromList(utf8.encode(body)));
+  return Message.fromBody(command: command, body: body);//Uint8List.fromList(utf8.encode(body)));
 }
 
 void checkMessageCommandAndBody({required Message message, required String command, required String body}){
   expect(message.header.command, command);
-  expect(message.body, Uint8List.fromList(utf8.encode(body)));
+  expect(message.body, body);
 }
 
 void messageConstructFromSendTest(){
@@ -244,6 +245,17 @@ void messageConstructFromSendTest(){
       // BODY_SIZE=4\n
       // -> 26byte
       expect(message.header.headerSize, 26);
+    });
+  });
+}
+
+void convertBinDataTest() {
+  group("convert bin data", () {
+    test("should be convert to uint8list", () {
+      Message message = constructMessageFromBody(command: "AAAAA", body: "aaaa");
+      Message receive = Message(Uint8List.fromList(utf8.encode(message.message)));
+      expect(receive.header.command, "AAAAA");
+      expect(receive.body, "aaaa");
     });
   });
 }
