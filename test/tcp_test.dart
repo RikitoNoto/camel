@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:camel/command.dart';
@@ -14,8 +13,15 @@ import 'package:camel/tcp.dart';
 import 'package:camel/message.dart';
 import 'command_test.dart';
 
-typedef ConnectFunc = Function(dynamic address, int port, {dynamic sourceAddress, int sourcePort, Duration? timeout});
-typedef BindFunc = Function(dynamic address, int port, {int backlog, bool v6Only, bool shared,});
+typedef ConnectFunc = Function(dynamic address, int port,
+    {dynamic sourceAddress, int sourcePort, Duration? timeout});
+typedef BindFunc = Function(
+  dynamic address,
+  int port, {
+  int backlog,
+  bool v6Only,
+  bool shared,
+});
 
 @GenerateMocks([Socket])
 @GenerateMocks([ServerSocket])
@@ -35,7 +41,8 @@ class ConnectSpy {
 }
 
 class ListenSpy {
-  ListenSpy({required this.tcp, required this.socket, required this.serverSocket});
+  ListenSpy(
+      {required this.tcp, required this.socket, required this.serverSocket});
   String? bindAddress;
   int? bindPort;
   final Tcp tcp;
@@ -51,7 +58,8 @@ Future<ConnectSpy> connectWithMock({
   Tcp tcp = Tcp();
   ConnectSpy spy = ConnectSpy(tcp: tcp, socket: mockSocket ?? MockSocket());
 
-  Future<Socket> connectMock(dynamic address, int port, {dynamic sourceAddress, int sourcePort=0, Duration? timeout}) async {
+  Future<Socket> connectMock(dynamic address, int port,
+      {dynamic sourceAddress, int sourcePort = 0, Duration? timeout}) async {
     spy.connectAddress = address;
     spy.connectPort = port;
     return spy.socket;
@@ -68,9 +76,18 @@ Future<ListenSpy> bindMock({
   MockServerSocket? mockServerSocket,
 }) async {
   Tcp tcp = Tcp();
-  ListenSpy spy = ListenSpy(tcp: tcp, socket: mockSocket ?? MockSocket(), serverSocket: mockServerSocket ?? MockServerSocket());
+  ListenSpy spy = ListenSpy(
+      tcp: tcp,
+      socket: mockSocket ?? MockSocket(),
+      serverSocket: mockServerSocket ?? MockServerSocket());
 
-  Future<ServerSocket> bindMock (dynamic address, int port, {int backlog=0, bool v6Only=false, bool shared=false,}) async{
+  Future<ServerSocket> bindMock(
+    dynamic address,
+    int port, {
+    int backlog = 0,
+    bool v6Only = false,
+    bool shared = false,
+  }) async {
     spy.bindAddress = address;
     spy.bindPort = port;
     return spy.serverSocket;
@@ -92,11 +109,13 @@ void useLibraryTest() {
   });
 
   group("send", () {
-    test("should be write the empty message to the address handed over", () async {
+    test("should be write the empty message to the address handed over",
+        () async {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
+      int sentByte = await spy.tcp
+          .send(CommunicateData(connection: spy.socket, message: mockMessage));
 
       verify(spy.socket.write("0\n"));
       expect(sentByte, 0);
@@ -106,7 +125,8 @@ void useLibraryTest() {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("message");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
+      int sentByte = await spy.tcp
+          .send(CommunicateData(connection: spy.socket, message: mockMessage));
 
       verify(spy.socket.write("7\nmessage"));
       expect(sentByte, 7);
@@ -114,21 +134,24 @@ void useLibraryTest() {
   });
 
   group("send", () {
-    test("should be write the empty message to the address handed over", () async{
+    test("should be write the empty message to the address handed over",
+        () async {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
+      int sentByte = await spy.tcp
+          .send(CommunicateData(connection: spy.socket, message: mockMessage));
 
       verify(spy.socket.write("0\n"));
       expect(sentByte, 0);
     });
 
-    test("should be write the message to the address handed over", () async{
+    test("should be write the message to the address handed over", () async {
       ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
       MockMessage mockMessage = MockMessage();
       when(mockMessage.message).thenReturn("message");
-      int sentByte = await spy.tcp.send(CommunicateData(connection: spy.socket, message: mockMessage));
+      int sentByte = await spy.tcp
+          .send(CommunicateData(connection: spy.socket, message: mockMessage));
 
       verify(spy.socket.write("7\nmessage"));
       expect(sentByte, 7);
@@ -136,25 +159,29 @@ void useLibraryTest() {
   });
 
   group("listen", () {
-    test("should be execute received message command", () async{
+    test("should be execute received message command", () async {
       ListenSpy spy = await bindMock();
 
       when(spy.serverSocket.listen(any)).thenAnswer((Invocation invocation) {
-        final void Function(Socket) connectCallback = invocation.positionalArguments[0];
+        final void Function(Socket) connectCallback =
+            invocation.positionalArguments[0];
 
         // when connection
         when(spy.socket.listen(any)).thenAnswer((Invocation invocation) {
-          final void Function(Uint8List) receiveCallback = invocation.positionalArguments[0];
-          receiveCallback(convertUint8data("32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
+          final void Function(Uint8List) receiveCallback =
+              invocation.positionalArguments[0];
+          receiveCallback(
+              convertUint8data("32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
           return StreamSubscriptionStub<Uint8List>();
         });
-        connectCallback(spy.socket);  // connection
+        connectCallback(spy.socket); // connection
         verify(spy.socket.listen(any));
         return StreamSubscriptionStub<Socket>();
       });
 
-      await for(CommunicateData<Socket> data in await spy.tcp.listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))){
-        expect(data.message.body, Uint8List.fromList(utf8.encode("body")));
+      await for (CommunicateData<Socket> data in await spy.tcp
+          .listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
+        expect(data.message.body, "body");
         expect(data.connection, spy.socket);
         break;
       }
@@ -166,19 +193,29 @@ void useLibraryTest() {
   });
 }
 
-class StreamSubscriptionStub<T> implements StreamSubscription<T>{
+class StreamSubscriptionStub<T> implements StreamSubscription<T> {
   @override
-  Future<void> cancel() async{
-    return ;
+  Future<void> cancel() async {
+    return;
   }
 
-  @override void onData(void Function(T)? handleData){}
-  @override void onError(Function? handleError) {}
-  @override void onDone(void Function()? handleDone){}
-  @override void pause([Future<void>? resumeSignal]) {}
-  @override void resume(){}
-  @override bool get isPaused{ return true; }
-  @override Future<E> asFuture<E>([E? futureValue])async{
+  @override
+  void onData(void Function(T)? handleData) {}
+  @override
+  void onError(Function? handleError) {}
+  @override
+  void onDone(void Function()? handleDone) {}
+  @override
+  void pause([Future<void>? resumeSignal]) {}
+  @override
+  void resume() {}
+  @override
+  bool get isPaused {
+    return true;
+  }
+
+  @override
+  Future<E> asFuture<E>([E? futureValue]) async {
     E resultValue;
     if (futureValue == null) {
       resultValue = futureValue as dynamic;

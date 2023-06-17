@@ -3,8 +3,6 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:typed_data' as _i3;
-
 import 'package:camel/message.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -54,12 +52,12 @@ class MockMessage extends _i1.Mock implements _i2.Message {
         returnValueForMissingStub: null,
       );
   @override
-  _i3.Uint8List get body => (super.noSuchMethod(
+  String get body => (super.noSuchMethod(
         Invocation.getter(#body),
-        returnValue: _i3.Uint8List(0),
-      ) as _i3.Uint8List);
+        returnValue: '',
+      ) as String);
   @override
-  set body(_i3.Uint8List? _body) => super.noSuchMethod(
+  set body(String? _body) => super.noSuchMethod(
         Invocation.setter(
           #body,
           _body,
@@ -133,6 +131,16 @@ class MockMessageHeader extends _i1.Mock implements _i2.MessageHeader {
         ),
         returnValueForMissingStub: null,
       );
+  @override
+  String get headContent => (super.noSuchMethod(
+        Invocation.getter(#headContent),
+        returnValue: '',
+      ) as String);
+  @override
+  String get message => (super.noSuchMethod(
+        Invocation.getter(#message),
+        returnValue: '',
+      ) as String);
   @override
   String? parseHeaderSection(
     String? header,

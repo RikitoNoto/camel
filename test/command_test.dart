@@ -12,32 +12,31 @@ import 'package:camel/message.dart';
 @GenerateMocks([Message])
 @GenerateMocks([MessageHeader])
 void main() {
-  setUp(() async{
+  setUp(() async {
     CommandFactory.clearCommands();
   });
   commandFactoryTest();
 }
 
-class CommandStub implements Command{
+class CommandStub implements Command {
   CommandStub({
     required this.command,
   });
 
-  @override final String command;
   @override
-  void execute(Uint8List data){
-
-  }
+  final String command;
+  @override
+  void execute(Uint8List data) {}
 }
 
 MockMessage constructMessageMock({
   MessageHeader? header,
-  Uint8List? body,
+  String? body,
   String? command,
   int? bodySize,
-}){
+}) {
   // if header does not set.
-  if(header == null){
+  if (header == null) {
     // construct header mock.
     header = MockMessageHeader();
     when(header.command).thenAnswer((realInvocation) {
@@ -55,16 +54,16 @@ MockMessage constructMessageMock({
   });
 
   when(mockMessage.body).thenAnswer((realInvocation) {
-    return body ?? Uint8List(0);
+    return body ?? "";
   });
 
   return mockMessage;
 }
 
-bool isInCommandList(Command command, List<Command> commandList){
+bool isInCommandList(Command command, List<Command> commandList) {
   bool result = false;
-  for(Command c in commandList){
-    if(command == c){
+  for (Command c in commandList) {
+    if (command == c) {
       result = true;
       break;
     }
@@ -72,24 +71,23 @@ bool isInCommandList(Command command, List<Command> commandList){
   return result;
 }
 
-Uint8List convertUint8data(String message){
+Uint8List convertUint8data(String message) {
   return Uint8List.fromList(utf8.encode(message));
 }
 
-void expectUint8List(Uint8List exp, Uint8List actual){
-  try{
+void expectUint8List(Uint8List exp, Uint8List actual) {
+  try {
     expect(exp.length, actual.length);
-    for(int i=0; i<exp.length; i++){
+    for (int i = 0; i < exp.length; i++) {
       expect(exp[i], actual[i]);
     }
-  }
-  catch(e){
+  } catch (e) {
     fail("two lists are difference.\n expect: $exp\n actual: $actual");
   }
 }
 
-void commandFactoryTest(){
-  group('register command', (){
+void commandFactoryTest() {
+  group('register command', () {
     test('should be return null if command no register', () {
       MockMessage mockMessage = constructMessageMock(command: "");
       Command? command = CommandFactory.getCommand(mockMessage);
@@ -114,11 +112,15 @@ void commandFactoryTest(){
       expect(command, null);
     });
 
-    test('should be return the Command registered after if commands register two times', () {
+    test(
+        'should be return the Command registered after if commands register two times',
+        () {
       CommandStub commandStubFirst = CommandStub(command: "A");
-      CommandFactory.registerCommand(commandStubFirst); // register command first.
+      CommandFactory.registerCommand(
+          commandStubFirst); // register command first.
       CommandStub commandStubSecond = CommandStub(command: "A");
-      CommandFactory.registerCommand(commandStubSecond); // register same command second.
+      CommandFactory.registerCommand(
+          commandStubSecond); // register same command second.
 
       MockMessage mockMessage = constructMessageMock(command: "A");
       Command? command = CommandFactory.getCommand(mockMessage);
@@ -126,7 +128,7 @@ void commandFactoryTest(){
     });
   });
 
-  group('get command list', (){
+  group('get command list', () {
     test('should be get empty list when register no command', () {
       expect(CommandFactory.commandList.length, 0);
     });

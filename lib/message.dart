@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-enum Sections{
+enum Sections {
   command,
   bodySize,
 }
@@ -25,6 +25,10 @@ class MessageHeader {
   late final int headerSize;
   late final String rawData;
 
+  String get headContent =>
+      "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n";
+  String get message => "$headerSize\n$headContent";
+
   MessageHeader(Uint8List data) {
     String? header = parseHeaderSize(utf8.decode(data));
 
@@ -36,16 +40,22 @@ class MessageHeader {
     }
 
     command = parseHeaderSection(header, Sections.command.name) ?? "";
-    bodySize = int.parse(parseHeaderSection(header, Sections.bodySize.name) ?? "0");
+    bodySize =
+        int.parse(parseHeaderSection(header, Sections.bodySize.name) ?? "0");
   }
 
   MessageHeader.fromParam({
     required this.command,
     required this.bodySize,
-  }){
-    headerSize = "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n".length;
+  }) {
+    headerSize =
+        "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n"
+            .length;
   }
 
+  /// parse a section in header from all of header.
+  /// section's format is <Section name>=<content>.
+  ///
   String? parseHeaderSection(String header, String section) {
     RegExpMatch? valueMatch =
         RegExp('^$section=(.*?)\$', dotAll: true, multiLine: true)
@@ -53,6 +63,8 @@ class MessageHeader {
     return valueMatch?.group(1);
   }
 
+  /// parse header size of the received message.
+  /// return: header content exclude the header size.
   String? parseHeaderSize(String src) {
     RegExpMatch? headerSizeMatch =
         RegExp('^([0-9]+)(?:$delimiter(.*))?', dotAll: true).firstMatch(src);
@@ -76,8 +88,8 @@ class MessageHeader {
 
 class Message {
   late final MessageHeader header;
-  late final Uint8List body;
-  String get message => "";
+  late final String body;
+  String get message => "${header.message}$body";
 
   Message(Uint8List data) {
     header = MessageHeader(data);
@@ -88,13 +100,13 @@ class Message {
     if (bodyEndPosition > data.length) {
       bodyEndPosition = data.length;
     }
-    body = Uint8List.fromList(data.sublist(headerEndPosition, bodyEndPosition));
+    body = utf8.decode(data.sublist(headerEndPosition, bodyEndPosition));
   }
 
   Message.fromBody({
     required String command,
     required this.body,
-  }){
+  }) {
     header = MessageHeader.fromParam(command: command, bodySize: body.length);
   }
 }
