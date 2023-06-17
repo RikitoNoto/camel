@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-enum Sections{
+enum Sections {
   command,
   bodySize,
 }
@@ -25,7 +25,8 @@ class MessageHeader {
   late final int headerSize;
   late final String rawData;
 
-  String get headContent => "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n";
+  String get headContent =>
+      "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n";
   String get message => "$headerSize\n$headContent";
 
   MessageHeader(Uint8List data) {
@@ -39,19 +40,22 @@ class MessageHeader {
     }
 
     command = parseHeaderSection(header, Sections.command.name) ?? "";
-    bodySize = int.parse(parseHeaderSection(header, Sections.bodySize.name) ?? "0");
+    bodySize =
+        int.parse(parseHeaderSection(header, Sections.bodySize.name) ?? "0");
   }
 
   MessageHeader.fromParam({
     required this.command,
     required this.bodySize,
-  }){
-    headerSize = "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n".length;
+  }) {
+    headerSize =
+        "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n"
+            .length;
   }
 
   /// parse a section in header from all of header.
   /// section's format is <Section name>=<content>.
-  /// 
+  ///
   String? parseHeaderSection(String header, String section) {
     RegExpMatch? valueMatch =
         RegExp('^$section=(.*?)\$', dotAll: true, multiLine: true)
@@ -102,7 +106,7 @@ class Message {
   Message.fromBody({
     required String command,
     required this.body,
-  }){
+  }) {
     header = MessageHeader.fromParam(command: command, bodySize: body.length);
   }
 }
