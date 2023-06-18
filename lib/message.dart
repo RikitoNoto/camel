@@ -1,11 +1,15 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+/// header sections
+///
+/// these sections represent meanings each of data in header.
 enum Sections {
-  command,
-  bodySize,
+  command,  /// represent the command of the message.
+  bodySize, /// represent the body size of the message.
 }
 
+/// section strings in a message.
 extension SectionsChars on Sections {
   String get name {
     switch (this) {
@@ -17,13 +21,30 @@ extension SectionsChars on Sections {
   }
 }
 
+/// a header class in message
+///
+/// ## format
+/// **<headerSize>\n[<sectionName>=<sectionData>\n...]**
+///
+/// headerSize: the size exclude the header size string itself and a char of LF after that strings of the header.
+/// sectionName: a name that describes represent the meaning of data written after the section name itself.
+/// sectionData: data of a section.
+///
+/// ### example
+/// this message header has a command section and a body size section.
+/// it represent SEND command and has 1000byte body data.
+/// (Body data is omitted)
+/// ```dart
+/// "28\nCOMMAND=SEND\nBODY_SIZE=1000\n..."
+/// ```
+///
 class MessageHeader {
-  static const String delimiter = "\n";
+  static const String delimiter = "\n"; /// a delimiter string in a header.
 
   late final String command;
   late final int bodySize;
-  late final int headerSize;
-  late final String rawData;
+  late final int headerSize;  /// a header size exclude the header size section.
+  late final String rawData;  /// raw data
 
   String get headContent =>
       "${Sections.command.name}=$command\n${Sections.bodySize.name}=$bodySize\n";
