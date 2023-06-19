@@ -1,6 +1,6 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\flutter"
+export "FLUTTER_ROOT=D:\create\flutter\camel\.fvm\flutter_sdk"
 export "FLUTTER_APPLICATION_PATH=D:\create\flutter\camel"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
