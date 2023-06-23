@@ -166,14 +166,15 @@ void useLibraryTest() {
         final void Function(Socket) connectCallback =
             invocation.positionalArguments[0];
 
-        // when connection
+        // socket.listen spy
         when(spy.socket.listen(any)).thenAnswer((Invocation invocation) {
           final void Function(Uint8List) receiveCallback =
               invocation.positionalArguments[0];
           receiveCallback(
-              convertUint8data("32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
+              convertUint8data("39\n32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
           return StreamSubscriptionStub<Uint8List>();
         });
+
         connectCallback(spy.socket); // connection
         verify(spy.socket.listen(any));
         return StreamSubscriptionStub<Socket>();
@@ -181,6 +182,7 @@ void useLibraryTest() {
 
       await for (CommunicateData<Socket> data in await spy.tcp
           .listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
+        expect(data.message.header.message, "32\nCOMMAND=someCommand\nBODY_SIZE=4\n");
         expect(data.message.body, "body");
         expect(data.connection, spy.socket);
         break;

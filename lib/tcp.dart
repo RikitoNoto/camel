@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
@@ -37,10 +38,27 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
     final StreamController<CommunicateData<Socket>> controller =
         StreamController();
     ServerSocket serverSocket = await _bind(bind.address, bind.port);
+    // connection
     serverSocket.listen((Socket socket) {
+      // receive data
       socket.listen((Uint8List data) {
+        int bodyPosition = 0;
+        int dataSize = 0;
+
+        // search first LF sign.
+        // chars until first LF represent the size of this message.
+        for(int i=0; i<data.length; i++){
+          if(data[i] == utf8.encode("\n").first){
+            bodyPosition = i + 1; // the message after first LF.
+            dataSize = int.parse(utf8.decode(data.sublist(0, i)));
+            break;
+          }
+        }
+
+        final receiveData = data.sublist(bodyPosition);
+
         controller.sink
-            .add(CommunicateData(connection: socket, message: Message(data)));
+            .add(CommunicateData(connection: socket, message: Message(receiveData)));
       });
     });
     return controller.stream;
