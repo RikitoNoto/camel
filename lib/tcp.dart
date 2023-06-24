@@ -16,7 +16,35 @@ class SocketConnectionPoint {
   final int port;
 }
 
+class CommunicateDataTcp{
+  CommunicateDataTcp({required this.connection, required this.dataSize});
+
+  void receive(Uint8List data){
+    final newBuffer = Uint8List(_receiveBuffer.length + data.length);
+    newBuffer.setAll(0, _receiveBuffer);
+    newBuffer.setAll(_receiveBuffer.length, data);
+    _receiveBuffer = newBuffer;
+  }
+
+  bool isReceivedAll(){
+    return _receiveBuffer.length >= dataSize;
+  }
+
+  CommunicateData<Socket>? get receiveData{
+    if(!isReceivedAll()) return null;
+
+    return CommunicateData<Socket>(connection: connection, message: Message(_receiveBuffer));
+  }
+
+  Uint8List _receiveBuffer = Uint8List(0);
+  final Socket connection;
+  final int dataSize;
+}
+
+
 class Tcp implements Communicator<Socket, SocketConnectionPoint> {
+  final Map<Socket, CommunicateDataTcp> _receiveBuffers = {};
+
   @override
   Future<Socket> connect(SocketConnectionPoint connectionPoint) async {
     return await _connect(connectionPoint.address, connectionPoint.port);
@@ -42,23 +70,35 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
     serverSocket.listen((Socket socket) {
       // receive data
       socket.listen((Uint8List data) {
-        int bodyPosition = 0;
-        int dataSize = 0;
-
-        // search first LF sign.
-        // chars until first LF represent the size of this message.
-        for(int i=0; i<data.length; i++){
-          if(data[i] == utf8.encode("\n").first){
-            bodyPosition = i + 1; // the message after first LF.
-            dataSize = int.parse(utf8.decode(data.sublist(0, i)));
-            break;
+        // if have not received data yet.
+        if(_receiveBuffers[socket] == null){
+          int bodyPosition = 0;
+          int dataSize = 0;
+          // search first LF sign.
+          // chars until first LF represent the size of this message.
+          for(int i=0; i<data.length; i++){
+            if(data[i] == utf8.encode("\n").first){
+              bodyPosition = i + 1; // the message after first LF.
+              dataSize = int.parse(utf8.decode(data.sublist(0, i)));
+              break;
+            }
           }
+
+          data = data.sublist(bodyPosition);  // change [data] to only the body.
+
+          _receiveBuffers[socket] = CommunicateDataTcp(connection: socket, dataSize: dataSize);
         }
 
-        final receiveData = data.sublist(bodyPosition);
+        final receiveBuffer = _receiveBuffers[socket];
+        if(receiveBuffer == null) return;
 
-        controller.sink
-            .add(CommunicateData(connection: socket, message: Message(receiveData)));
+        receiveBuffer.receive(data);
+
+        // if received all of messages.
+        if(receiveBuffer.isReceivedAll()){
+          controller.sink.add(receiveBuffer.receiveData!);  // stream data.
+          _receiveBuffers.remove(receiveBuffer.connection); // remove buffer.
+        }
       });
     });
     return controller.stream;

@@ -48,6 +48,7 @@ class ListenSpy {
   final Tcp tcp;
   final MockSocket socket;
   final MockServerSocket serverSocket;
+  void Function(Uint8List)? receiveCallback;
 }
 
 Future<ConnectSpy> connectWithMock({
@@ -96,6 +97,30 @@ Future<ListenSpy> bindMock({
   tcp.setBindMock(bindMock);
 
   return spy;
+}
+
+void constructListenMock(ListenSpy spy, List<String> receiveData){
+  when(spy.serverSocket.listen(any)).thenAnswer((Invocation invocation) {
+    final void Function(Socket) connectCallback = invocation.positionalArguments[0];
+    constructSocketMock(spy, receiveData);
+    connectCallback(spy.socket); // connection
+    verify(spy.socket.listen(any));
+    return StreamSubscriptionStub<Socket>();
+  });
+}
+
+void constructSocketMock(ListenSpy spy, List<String> receiveData){
+  // socket.listen spy
+  when(spy.socket.listen(any)).thenAnswer((Invocation invocation) {
+    final void Function(Uint8List) receiveCallback = invocation.positionalArguments[0];
+    spy.receiveCallback = receiveCallback;
+
+    // call as many times as receiveData.
+    for(String data in receiveData){
+      receiveCallback(convertUint8data(data));
+    }
+    return StreamSubscriptionStub<Uint8List>();
+  });
 }
 
 void useLibraryTest() {
@@ -162,23 +187,25 @@ void useLibraryTest() {
     test("should be execute received message command", () async {
       ListenSpy spy = await bindMock();
 
-      when(spy.serverSocket.listen(any)).thenAnswer((Invocation invocation) {
-        final void Function(Socket) connectCallback =
-            invocation.positionalArguments[0];
+      constructListenMock(spy, ["39\n32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"]);
 
-        // socket.listen spy
-        when(spy.socket.listen(any)).thenAnswer((Invocation invocation) {
-          final void Function(Uint8List) receiveCallback =
-              invocation.positionalArguments[0];
-          receiveCallback(
-              convertUint8data("39\n32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"));
-          return StreamSubscriptionStub<Uint8List>();
-        });
+      await for (CommunicateData<Socket> data in await spy.tcp
+          .listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
+        expect(data.message.header.message, "32\nCOMMAND=someCommand\nBODY_SIZE=4\n");
+        expect(data.message.body, "body");
+        expect(data.connection, spy.socket);
+        break;
+      }
 
-        connectCallback(spy.socket); // connection
-        verify(spy.socket.listen(any));
-        return StreamSubscriptionStub<Socket>();
-      });
+      verify(spy.serverSocket.listen(any));
+      expect(spy.bindAddress, "127.0.0.1");
+      expect(spy.bindPort, 1000);
+    });
+
+    test("should be receive split data", () async {
+      ListenSpy spy = await bindMock();
+
+      constructListenMock(spy, ["39\n32\nCOMMAND=someCommand","\nBODY_SIZE=4\nbody"]);
 
       await for (CommunicateData<Socket> data in await spy.tcp
           .listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
