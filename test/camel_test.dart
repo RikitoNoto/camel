@@ -6,24 +6,21 @@ import 'package:camel/command.dart';
 import 'package:camel/communicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'tcp_test.mocks.dart';
 
 import 'package:camel/tcp.dart';
 import 'package:camel/message.dart';
 import 'package:camel/camel.dart';
-import 'command_test.dart';
 
 void main() {
   useTcpTest();
 }
 
 class CommandStub implements Command{
-  String get command => "STUB";
+  @override String get command => "STUB";
   static Uint8List? receiveSpy;
   static bool isCalledExecute = false;
 
+  @override
   void execute(Uint8List data){
     isCalledExecute = true;
     receiveSpy = data;
@@ -48,7 +45,7 @@ void useTcpTest() {
         Message.fromBody(command: CommandStub().command, body: "Hello, camel")
       );
 
-      await for(CommunicateData<Socket> data in stream){
+      await for(CommunicateData<Socket> _ in stream){
         break;
       }
 
