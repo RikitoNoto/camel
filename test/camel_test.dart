@@ -51,6 +51,6 @@ void useTcpTest() {
 
       expect(CommandStub.isCalledExecute, isTrue);
       expect(utf8.decode(CommandStub.receiveSpy!), "Hello, camel");
-    });
+    }, tags: "UseNetwork");
   });
 }
