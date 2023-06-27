@@ -49,7 +49,6 @@ void useTcpTest() {
         break;
       }
 
-      await Future.delayed(const Duration(seconds: 1));
       expect(CommandStub.isCalledExecute, isTrue);
       expect(utf8.decode(CommandStub.receiveSpy!), "Hello, camel");
     });
