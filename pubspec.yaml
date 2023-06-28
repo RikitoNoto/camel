@@ -1,6 +1,6 @@
 name: camel
-description: A new Flutter package project.
-version: 0.0.1
+description: A Flutter package for communicating in a local network.
+version: 1.0.0
 homepage:
 
 environment:
