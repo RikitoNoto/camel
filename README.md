@@ -1,10 +1,10 @@
 # Camel
-[日本語]()<br/>
+[日本語](doc/README.jp.md)<br/>
 
 Flutter package that allows communicating in a local network.
 
 ## Features
-This application allows you to communicate in a local network without "dart:io" package.
+This library allows you to communicate in a local network without "dart:io" package.
 Also, you can switch callback communication or stream communication.
 
 ## Getting started
@@ -47,6 +47,7 @@ When using a command callback, you define a custom command class as below.
   // if you use socket communication and TCP.
   final Communicator communicator = Tcp();
   final Camel<Socket, SocketConnectionPoint> sender = Camel(communicator);
+  CommandFactory.registerCommand(MyCommand());  // register command.
 
   // call send method with a connection point a send message.
   sender.send(
@@ -87,6 +88,7 @@ When the receiver receives the custom command, then call the execute method of t
   // if you use socket communication and TCP.
   final Communicator communicator = Tcp();
   final Camel<Socket, SocketConnectionPoint> receiver = Camel(communicator);
+  CommandFactory.registerCommand(MyCommand());  // register command.
 
   // call listen method with a bind connection point.
   await for(
