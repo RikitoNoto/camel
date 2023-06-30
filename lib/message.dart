@@ -7,6 +7,7 @@ import 'dart:typed_data';
 enum Sections {
   /// represent the command of the message.
   command,
+
   /// represent the body size of the message.
   bodySize,
 }
@@ -107,7 +108,8 @@ class MessageHeader {
   /// after that return a header string exclude the header size.
   String? parseHeaderSize(String message) {
     RegExpMatch? headerSizeMatch =
-        RegExp('^([0-9]+)(?:$delimiter(.*))?', dotAll: true).firstMatch(message);
+        RegExp('^([0-9]+)(?:$delimiter(.*))?', dotAll: true)
+            .firstMatch(message);
     final String? headerSizeStr = headerSizeMatch?.group(1);
 
     // check it was not match.

@@ -1,4 +1,5 @@
 import 'message.dart';
+export "tcp.dart";
 
 class CommunicateData<T> {
   CommunicateData({required this.connection, required this.message});
@@ -8,8 +9,12 @@ class CommunicateData<T> {
 }
 
 abstract class Communicator<T, C> {
-  Future<T> connect(C connectionPoint); // connection then return connection object.
+  Future<T> connect(
+      C connectionPoint); // connection then return connection object.
   Future close(); // close connection.
-  Future<int> send(CommunicateData<T> data); // send message to the connection and return send size.
-  Future<Stream<CommunicateData<T>>> listen(C bind); // listen connect and receive messages.
+  Future<int> send(
+      CommunicateData<T>
+          data); // send message to the connection and return send size.
+  Future<Stream<CommunicateData<T>>> listen(
+      C bind); // listen connect and receive messages.
 }
