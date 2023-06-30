@@ -1,4 +1,4 @@
-<img height="300px" src="doc/assets/rogo.png">
+<img height="200px" src="doc/assets/rogo.png">
 
 # Camel
 [日本語](doc/README.jp.md)<br/>

@@ -1,3 +1,5 @@
+<img height="200px" src="doc/assets/rogo.png">
+
 # Camel
 [English](../README.md)<br/>
 
