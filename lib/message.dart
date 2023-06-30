@@ -167,10 +167,10 @@ class Message {
 
   /// constructor from params(send data).
   Message.fromBody({
-    required String command,
+    String? command,
     required this.body,
   }) {
-    header = MessageHeader.fromParam(command: command, bodySize: body.length);
+    header = MessageHeader.fromParam(command: command ?? "", bodySize: body.length);
   }
 }
 
