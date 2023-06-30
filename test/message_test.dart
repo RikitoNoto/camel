@@ -239,7 +239,7 @@ void messageFormatTest() {
 }
 
 Message constructMessageFromBody(
-    {required String command, required String body}) {
+    {String? command, required String body}) {
   return Message.fromBody(
       command: command, body: body); //Uint8List.fromList(utf8.encode(body)));
 }
@@ -253,7 +253,7 @@ void checkMessageCommandAndBody(
 void messageConstructFromSendTest() {
   group("constructor from sender", () {
     test("should be construct message command and body", () {
-      Message message = constructMessageFromBody(command: "", body: "");
+      Message message = constructMessageFromBody(body: "");
       checkMessageCommandAndBody(message: message, command: "", body: "");
     });
 
