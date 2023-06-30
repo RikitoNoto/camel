@@ -1,3 +1,5 @@
+<img height="200px" src="assets/logo.png">
+
 # Camel
 [English](../README.md)<br/>
 
