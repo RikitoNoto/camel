@@ -25,8 +25,9 @@ class Camel<T, C> {
   Stream<CommunicateData<T>> listen(C bind) async* {
     await for (CommunicateData<T> data in await communicator.listen(bind)) {
       Command? command = CommandFactory.getCommand(data.message);
-      if (command != null)
+      if (command != null) {
         command.execute(Uint8List.fromList(utf8.encode(data.message.body)));
+      }
       yield data;
     }
   }
