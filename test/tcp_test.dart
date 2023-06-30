@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:camel/command.dart';
-import 'package:camel/communicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'tcp_test.mocks.dart';
 
-import 'package:camel/tcp.dart';
-import 'package:camel/message.dart';
+import "package:camel/camel.dart";
 import 'command_test.dart';
 
 typedef ConnectFunc = Function(dynamic address, int port,
@@ -99,9 +96,10 @@ Future<ListenSpy> bindMock({
   return spy;
 }
 
-void constructListenMock(ListenSpy spy, List<String> receiveData){
+void constructListenMock(ListenSpy spy, List<String> receiveData) {
   when(spy.serverSocket.listen(any)).thenAnswer((Invocation invocation) {
-    final void Function(Socket) connectCallback = invocation.positionalArguments[0];
+    final void Function(Socket) connectCallback =
+        invocation.positionalArguments[0];
     constructSocketMock(spy, receiveData);
     connectCallback(spy.socket); // connection
     verify(spy.socket.listen(any));
@@ -109,14 +107,15 @@ void constructListenMock(ListenSpy spy, List<String> receiveData){
   });
 }
 
-void constructSocketMock(ListenSpy spy, List<String> receiveData){
+void constructSocketMock(ListenSpy spy, List<String> receiveData) {
   // socket.listen spy
   when(spy.socket.listen(any)).thenAnswer((Invocation invocation) {
-    final void Function(Uint8List) receiveCallback = invocation.positionalArguments[0];
+    final void Function(Uint8List) receiveCallback =
+        invocation.positionalArguments[0];
     spy.receiveCallback = receiveCallback;
 
     // call as many times as receiveData.
-    for(String data in receiveData){
+    for (String data in receiveData) {
       receiveCallback(convertUint8data(data));
     }
     return StreamSubscriptionStub<Uint8List>();
@@ -187,11 +186,13 @@ void useLibraryTest() {
     test("should be execute received message command", () async {
       ListenSpy spy = await bindMock();
 
-      constructListenMock(spy, ["39\n32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"]);
+      constructListenMock(
+          spy, ["39\n32\nCOMMAND=someCommand\nBODY_SIZE=4\nbody"]);
 
       await for (CommunicateData<Socket> data in await spy.tcp
           .listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
-        expect(data.message.header.message, "32\nCOMMAND=someCommand\nBODY_SIZE=4\n");
+        expect(data.message.header.message,
+            "32\nCOMMAND=someCommand\nBODY_SIZE=4\n");
         expect(data.message.body, "body");
         expect(data.connection, spy.socket);
         break;
@@ -205,11 +206,13 @@ void useLibraryTest() {
     test("should be receive split data", () async {
       ListenSpy spy = await bindMock();
 
-      constructListenMock(spy, ["39\n32\nCOMMAND=someCommand","\nBODY_SIZE=4\nbody"]);
+      constructListenMock(
+          spy, ["39\n32\nCOMMAND=someCommand", "\nBODY_SIZE=4\nbody"]);
 
       await for (CommunicateData<Socket> data in await spy.tcp
           .listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
-        expect(data.message.header.message, "32\nCOMMAND=someCommand\nBODY_SIZE=4\n");
+        expect(data.message.header.message,
+            "32\nCOMMAND=someCommand\nBODY_SIZE=4\n");
         expect(data.message.body, "body");
         expect(data.connection, spy.socket);
         break;
