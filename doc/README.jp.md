@@ -1,5 +1,7 @@
+<img width="100%" src="https://raw.githubusercontent.com/RikitoNoto/camel/master/doc/assets/logo.png">
+
 # Camel
-[English](../README.md)<br/>
+[English](https://github.com/RikitoNoto/camel/blob/master/README.md)<br/>
 
 ローカルネットワークで通信を行うためのFlutterパッケージ。
 
