@@ -6,3 +6,5 @@ Changed the import file to be only camel.dart
 made it possible to omit the command argument of the Message class.
 ## 1.3.0
 change links in README.md to github repository, and change logo size.
+### 1.3.1
+change the folder name of exsample to example.
