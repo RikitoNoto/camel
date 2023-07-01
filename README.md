@@ -1,7 +1,7 @@
-<img height="200px" src="doc/assets/logo.png">
+<img width="100%" src="https://raw.githubusercontent.com/RikitoNoto/camel/master/doc/assets/logo.png">
 
 # Camel
-[日本語](doc/README.jp.md)<br/>
+[日本語](https://github.com/RikitoNoto/camel/blob/master/doc/README.jp.md)<br/>
 
 Flutter package that allows communicating in a local network.
 
