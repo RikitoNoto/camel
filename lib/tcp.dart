@@ -44,14 +44,26 @@ class CommunicateDataTcp {
 
 class Tcp implements Communicator<Socket, SocketConnectionPoint> {
   final Map<Socket, CommunicateDataTcp> _receiveBuffers = {};
+  final List<Socket> _connection = [];
+  final List<ServerSocket> _servers = [];
 
   @override
   Future<Socket> connect(SocketConnectionPoint connectionPoint) async {
-    return await _connect(connectionPoint.address, connectionPoint.port);
+    Socket connection = await _connect(connectionPoint.address, connectionPoint.port);
+    _connection.add(connection);
+    return connection;
   }
 
   @override
-  Future close() async {}
+  Future close() async {
+    for(Socket connection in _connection){
+      await connection.close();
+    }
+
+    for(ServerSocket server in _servers){
+      await server.close();
+    }
+  }
 
   @override
   Future<int> send(CommunicateData<Socket> data) async {
@@ -66,8 +78,10 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
     final StreamController<CommunicateData<Socket>> controller =
         StreamController();
     ServerSocket serverSocket = await _bind(bind.address, bind.port);
+    _servers.add(serverSocket);
     // connection
     serverSocket.listen((Socket socket) {
+      _connection.add(socket);
       // receive data
       socket.listen((Uint8List data) {
         // if have not received data yet.
@@ -110,6 +124,7 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
       {dynamic sourceAddress,
       int sourcePort,
       Duration? timeout}) _connect = Socket.connect;
+
   Function(
     dynamic address,
     int port, {
@@ -118,6 +133,7 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
     bool shared,
   }) _bind = ServerSocket.bind;
 
+  @visibleForTesting
   void setConnectMock(
       Function(dynamic, int,
               {dynamic sourceAddress, int sourcePort, Duration? timeout})
@@ -127,6 +143,7 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
     }
   }
 
+  @visibleForTesting
   void setBindMock(
       Function(
         dynamic address,
