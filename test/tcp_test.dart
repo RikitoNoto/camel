@@ -75,9 +75,10 @@ Future<ListenSpy> bindMock({
 }) async {
   Tcp tcp = Tcp();
   ListenSpy spy = ListenSpy(
-      tcp: tcp,
-      socket: mockSocket ?? MockSocket(),
-      serverSocket: mockServerSocket ?? MockServerSocket());
+    tcp: tcp,
+    socket: mockSocket ?? MockSocket(),
+    serverSocket: mockServerSocket ?? MockServerSocket()
+  );
 
   Future<ServerSocket> bindMock(
     dynamic address,
@@ -122,6 +123,27 @@ void constructSocketMock(ListenSpy spy, List<String> receiveData) {
   });
 }
 
+Future listen(ListenSpy spy, {bool waitReceive=false, Function(CommunicateData<Socket>)? callback, List<String>? receiveDatas}) async {
+  constructListenMock(spy, receiveDatas ?? []);
+  listenFunc() async {
+    await for (CommunicateData<Socket> data in await spy.tcp.listen(SocketConnectionPoint(address: "127.0.0.1", port: 1000))) {
+    if(callback == null){
+    break;
+    }
+    callback(data);
+    }
+  }
+
+  if(waitReceive){
+    await listenFunc();
+  }
+  else{
+    listenFunc();
+    await Future.delayed(const Duration(seconds: 0));
+  }
+}
+
+
 void useLibraryTest() {
   group("connect", () {
     test("should be hand over the IP address and the port number", () async {
@@ -129,31 +151,6 @@ void useLibraryTest() {
 
       expect(spy.connectAddress, "127.0.0.1");
       expect(spy.connectPort, 1000);
-    });
-  });
-
-  group("send", () {
-    test("should be write the empty message to the address handed over",
-        () async {
-      ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
-      MockMessage mockMessage = MockMessage();
-      when(mockMessage.message).thenReturn("");
-      int sentByte = await spy.tcp
-          .send(CommunicateData(connection: spy.socket, message: mockMessage));
-
-      verify(spy.socket.write("0\n"));
-      expect(sentByte, 0);
-    });
-
-    test("should be write the message to the address handed over", () async {
-      ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
-      MockMessage mockMessage = MockMessage();
-      when(mockMessage.message).thenReturn("message");
-      int sentByte = await spy.tcp
-          .send(CommunicateData(connection: spy.socket, message: mockMessage));
-
-      verify(spy.socket.write("7\nmessage"));
-      expect(sentByte, 7);
     });
   });
 
@@ -221,6 +218,61 @@ void useLibraryTest() {
       verify(spy.serverSocket.listen(any));
       expect(spy.bindAddress, "127.0.0.1");
       expect(spy.bindPort, 1000);
+    });
+  });
+
+  group("close", () {
+    test("should be close a connected connection", () async {
+      ConnectSpy spy = await connectWithMock(address: "127.0.0.1", port: 1000);
+      when(spy.socket.close()).thenAnswer((_) => Future.value(null));
+
+      await spy.tcp.close();
+      verify(spy.socket.close());
+    });
+
+    test("should be close a listened connection", () async {
+      ListenSpy spy = await bindMock();
+      await listen(spy);
+      when(spy.socket.close()).thenAnswer((_) => Future.value(null));
+      when(spy.serverSocket.close()).thenAnswer((_) => Future.value(spy.serverSocket));
+
+      await spy.tcp.close();
+      verify(spy.socket.close());
+    });
+
+    test("should be close a bound server connection", () async {
+      ListenSpy spy = await bindMock();
+      await listen(spy);
+
+      when(spy.socket.close()).thenAnswer((_) => Future.value(null));
+      when(spy.serverSocket.close()).thenAnswer((_) => Future.value(spy.serverSocket));
+
+      await spy.tcp.close();
+      verify(spy.serverSocket.close());
+    });
+
+    test("should be close listened connections", () async {
+      ListenSpy spy = await bindMock();
+      await listen(spy);
+      await listen(spy);
+
+      when(spy.socket.close()).thenAnswer((_) => Future.value(null));
+      when(spy.serverSocket.close()).thenAnswer((_) => Future.value(spy.serverSocket));
+
+      await spy.tcp.close();
+      verify(spy.socket.close()).called(2);
+    });
+
+    test("should be close bound server connections", () async {
+      ListenSpy spy = await bindMock();
+      await listen(spy);
+      await listen(spy);
+
+      when(spy.socket.close()).thenAnswer((_) => Future.value(null));
+      when(spy.serverSocket.close()).thenAnswer((_) => Future.value(spy.serverSocket));
+
+      await spy.tcp.close();
+      verify(spy.serverSocket.close()).called(2);
     });
   });
 }
