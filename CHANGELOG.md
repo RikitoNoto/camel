@@ -8,3 +8,5 @@ made it possible to omit the command argument of the Message class.
 change links in README.md to github repository, and change logo size.
 ### 1.3.1
 change the folder name of exsample to example.
+### 1.3.2
+fix didn't call close method.

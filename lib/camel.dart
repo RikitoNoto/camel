@@ -31,4 +31,8 @@ class Camel<T, C> {
       yield data;
     }
   }
+
+  void close(){
+    communicator.close();
+  }
 }
