@@ -46,6 +46,7 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
   final Map<Socket, CommunicateDataTcp> _receiveBuffers = {};
   final List<Socket> _connection = [];
   final List<ServerSocket> _servers = [];
+  final List<StreamController> _streams = [];
 
   @override
   Future<Socket> connect(SocketConnectionPoint connectionPoint) async {
@@ -63,6 +64,10 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
     for(ServerSocket server in _servers){
       await server.close();
     }
+
+    for(StreamController controller in _streams){
+      await controller.close();
+    }
   }
 
   @override
@@ -77,6 +82,7 @@ class Tcp implements Communicator<Socket, SocketConnectionPoint> {
       SocketConnectionPoint bind) async {
     final StreamController<CommunicateData<Socket>> controller =
         StreamController();
+    _streams.add(controller);
     ServerSocket serverSocket = await _bind(bind.address, bind.port);
     _servers.add(serverSocket);
     // connection
