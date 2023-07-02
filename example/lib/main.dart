@@ -61,17 +61,18 @@ class _NoCommandPage extends State<NoCommandPage> {
     }
   }
 
-  void _send() {
+  void _send() async {
     final Camel<Socket, SocketConnectionPoint> sender =
         Camel<Socket, SocketConnectionPoint>(Tcp());
     // call send method for send message.
-    sender.send(
+    await sender.send(
       SocketConnectionPoint(address: myAddress, port: port),
       Message.fromBody(
           command: "dummy",
           body:
               _sendText), // if you don't use command, a command arg is anything.
     );
+    sender.close();
   }
 
   @override
@@ -155,17 +156,19 @@ class _CommandPage extends State<CommandPage> implements Command {
         .listen(SocketConnectionPoint(address: myAddress, port: port))) {}
   }
 
-  void _send() {
+  void _send() async{
     final Camel<Socket, SocketConnectionPoint> sender =
         Camel<Socket, SocketConnectionPoint>(Tcp());
     // call send method for send message.
-    sender.send(
+    await sender.send(
       SocketConnectionPoint(address: myAddress, port: port),
       Message.fromBody(
           command: "MY_COMMAND",
           body:
               _sendText), // if you don't use command, a command arg is anything.
     );
+
+    sender.close();
   }
 
   @override
