@@ -10,3 +10,5 @@ change links in README.md to github repository, and change logo size.
 change the folder name of exsample to example.
 ### 1.3.2
 fix didn't call close method.
+### 1.3.3
+fix didn't call close method of stream.
